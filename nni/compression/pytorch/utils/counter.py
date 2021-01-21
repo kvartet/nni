@@ -6,7 +6,8 @@ from collections import Counter
 from prettytable import PrettyTable
 
 import torch
-import torch.nn as nn
+# import torch.nn as nn
+import nni.retiarii.nn.pytorch.nn as nn
 from nni.compression.pytorch.compressor import PrunerModuleWrapper
 
 

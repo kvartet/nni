@@ -2,7 +2,6 @@ import logging
 import os
 import random
 import string
-import re
 from typing import Dict, Any, List
 
 from .interface import AbstractExecutionEngine, AbstractGraphListener
@@ -115,31 +114,28 @@ class BaseExecutionEngine(AbstractExecutionEngine):
         random_str = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
         file_name = f'_generated_model_{random_str}.py'
         
-        script = re.sub('nni.retiarii.nn.pytorch.', '', graph_data.model_script)
         with open(file_name, 'w') as f:
-            f.write(script)
-        
+            f.write(graph_data.model_script)
+
         trainer_cls = utils.import_(graph_data.training_module)
         model_cls = utils.import_(f'_generated_model_{random_str}._model')
 
         print('model_cls().type {}'.format(model_cls().type))
 
-        input_size = (1, 1, 28, 28) # mnist input_size
+        input_size = (1, 1, 28, 28)  # mnist input_size
         flops, params, results = count_flops_params(
             model_cls(), input_size, verbose=False)
         print('FLOPs : {}, Params : {}'.format(flops, params))
-        # 因为把所有的layer都当成了blackbox_module所以计算flops失败
 
         trainer_instance = trainer_cls(
             model=model_cls(), **graph_data.training_kwargs)
 
         # The same FLOPS, but the 'params' of net with bias is 129388,
         # the other one is 129260
-        # example im7jbnhu fit:T8JS5 abort:lk34E
-        if params < 129300:
+        if params < 129300: # threshold
             trainer_instance.fit()
-            print('fit!')
+            print('Train!')
         else:
             report_final_result(0.0001)
-            print('abort!')
+            print('Abort!')
         os.remove(file_name)
