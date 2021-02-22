@@ -146,7 +146,7 @@ def parse_config_args(exp_name):
     parser.add_argument(
         '--cfg',
         type=str,
-        default='../experiments/workspace/retrain/retrain.yaml',
+        default='configs/train.yaml',
         help='configuration of cream')
     parser.add_argument('--local_rank', type=int, default=0,
                         help='local_rank')

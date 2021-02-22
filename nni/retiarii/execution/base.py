@@ -122,13 +122,12 @@ class BaseExecutionEngine(AbstractExecutionEngine):
 
         print('model_cls().type {}'.format(model_cls().type))
 
-        input_size = (1, 1, 28, 28)  # mnist input_size
-        flops, params, results = count_flops_params(
-            model_cls(), input_size, verbose=False)
-        print('FLOPs : {}, Params : {}'.format(flops, params))
-
         trainer_instance = trainer_cls(
             model=model_cls(), **graph_data.training_kwargs)
+
+        flops, params, _ = count_flops_params(model_cls(), 
+            tuple(trainer_instance._trainer_kwargs["input_size"]), verbose=False)
+        print('FLOPs : {}, Params : {}'.format(flops, params))
 
         # The same FLOPS, but the 'params' of net with bias is 129388,
         # the other one is 129260

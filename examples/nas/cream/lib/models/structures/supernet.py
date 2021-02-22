@@ -36,7 +36,7 @@ class SuperNet(nn.Module):
             global_pool='avg',
             resunit=False,
             dil_conv=False,
-            verbose=False):
+            verbose=True):
         super(SuperNet, self).__init__()
 
         self.num_classes = num_classes
@@ -71,6 +71,8 @@ class SuperNet(nn.Module):
             dil_conv=dil_conv,
             logger=self.logger)
         blocks = builder(self._in_chs, block_args)
+        print('before generating mutators')
+        
         self.blocks = nn.Sequential(*blocks)
         self._in_chs = builder.in_chs
 
@@ -178,8 +180,13 @@ def gen_supernet(flops_minimum=0, flops_maximum=600, **kwargs):
         ['cn_r1_k1_s1_c320_se0.25'],
     ]
 
-    sta_num, arch_def, resolution = search_for_layer(
-        flops_op_dict, arch_def, flops_minimum, flops_maximum)
+    # sta_num, arch_def, resolution = search_for_layer(
+        # flops_op_dict, arch_def, flops_minimum, flops_maximum)
+    resolution = 224
+    sta_num = sum([len(i) for i in arch_def])
+    # print('sta_num {}'.format(sta_num))
+    # for item in arch_def:
+    #     print(item)
 
     if sta_num is None or arch_def is None or resolution is None:
         raise ValueError('Invalid FLOPs Settings')
@@ -199,4 +206,6 @@ def gen_supernet(flops_minimum=0, flops_maximum=600, **kwargs):
         **kwargs,
     )
     model = SuperNet(**model_kwargs)
+    with open('print_model.py','w') as f:
+        f.write(str(model))
     return model, sta_num, resolution

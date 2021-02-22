@@ -4,12 +4,13 @@
 # email: haodu8-c@my.cityu.edu.hk and houwen.peng@microsoft.com
 
 def search_for_layer(flops_op_dict, arch_def, flops_minimum, flops_maximum):
-    sta_num = [1, 1, 1, 1, 1]
+    sta_num = [1, 1, 1, 1, 1] # five stages
     order = [2, 3, 4, 1, 0, 2, 3, 4, 1, 0]
     limits = [3, 3, 3, 2, 2, 4, 4, 4, 4, 4]
     size_factor = 224 // 32
     base_min_flops = sum([flops_op_dict[i][0][0] for i in range(5)])
     base_max_flops = sum([flops_op_dict[i][5][0] for i in range(5)])
+    # 遍历所有的 stage（5），假设一个stage选一个，且不重复，stride为1 最少和最多需要的 flops
 
     if base_min_flops > flops_maximum:
         while base_min_flops > flops_maximum and size_factor >= 2:
@@ -42,6 +43,5 @@ def search_for_layer(flops_op_dict, arch_def, flops_minimum, flops_maximum):
             break
 
     arch_def = [item[:i] for i, item in zip([1] + sta_num + [1], arch_def)]
-    # print(arch_def)
 
     return sta_num, arch_def, size_factor * 32

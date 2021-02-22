@@ -25,12 +25,15 @@ class FlopsEst(object):
 
         input = torch.randn(input_shape)
 
+
         flops, params = get_model_complexity_info(
             model.conv_stem, (3, 224, 224), as_strings=False, print_per_layer_stat=False)
-        self.params_fixed += params / 1e6
-        self.flops_fixed += flops / 1e6
+        print('stem flops {}'.format(flops))
+        self.params_fixed += params / 1.0
+        self.flops_fixed += flops / 1.0
 
         input = model.conv_stem(input)
+
 
         for block_id, block in enumerate(model.blocks):
             self.flops_dict[block_id] = {}
@@ -38,26 +41,41 @@ class FlopsEst(object):
             for module_id, module in enumerate(block):
                 flops, params = get_model_complexity_info(module, tuple(
                     input.shape[1:]), as_strings=False, print_per_layer_stat=False)
+                # print('input shape {}, block_id {}, module_id {}, flops {}'.format(tuple(
+                    # input.shape[1:]),block_id,module_id,flops))
+                # with open('raw.csv','a+') as f:
+                    # f.write(str(int(flops))+'\n')
                 # Flops(M)
-                self.flops_dict[block_id][module_id] = flops / 1e6
+                self.flops_dict[block_id][module_id] = flops / 1.0
                 # Params(M)
-                self.params_dict[block_id][module_id] = params / 1e6
+                self.params_dict[block_id][module_id] = params / 1.0
 
             input = module(input)
 
-        # conv_last
+        # globalpool
         flops, params = get_model_complexity_info(model.global_pool, tuple(
             input.shape[1:]), as_strings=False, print_per_layer_stat=False)
-        self.params_fixed += params / 1e6
-        self.flops_fixed += flops / 1e6
+        print('conv_last flops {}'.format(flops))
+        self.params_fixed += params / 1.0
+        self.flops_fixed += flops / 1.0
 
         input = model.global_pool(input)
 
-        # globalpool
+        # conv_last
         flops, params = get_model_complexity_info(model.conv_head, tuple(
             input.shape[1:]), as_strings=False, print_per_layer_stat=False)
-        self.params_fixed += params / 1e6
-        self.flops_fixed += flops / 1e6
+        self.params_fixed += params / 1.0
+        self.flops_fixed += flops / 1.0
+        print('globalpool flops {}'.format(flops))
+        # print('flops dict {} '.format(self.flops_dict))
+        f = self.flops_fixed
+        for i in range(23):
+            if len(self.flops_dict[i]) < 6:
+                f += self.flops_dict[i][0]
+            else:
+                f += self.flops_dict[i][5]
+        print(f)
+
 
     # return params (M)
     def get_params(self, arch):

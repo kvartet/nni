@@ -5,6 +5,7 @@
 
 # This dictionary is generated from calculating each operation of each layer to quickly search for layers.
 # flops_op_dict[which_stage][which_operation] =
+# stages: 5, operations:6
 # (flops_of_operation_with_stride1, flops_of_operation_with_stride2)
 
 flops_op_dict = {}
@@ -40,3 +41,8 @@ flops_op_dict[4][2] = (11.608512, 15.894528)
 flops_op_dict[4][3] = (17.458656, 24.053568)
 flops_op_dict[4][4] = (12.060096, 16.797696)
 flops_op_dict[4][5] = (18.136032, 25.40832)
+
+base_min_flops = sum([flops_op_dict[i][0][0] for i in range(5)])
+base_max_flops = sum([flops_op_dict[i][5][0] for i in range(5)])
+print('min',base_min_flops)
+print('max',base_max_flops)

@@ -7,6 +7,9 @@ from timm.models.efficientnet_blocks import *
 
 from nni.nas.pytorch import mutables
 
+print_log = False
+model_log = False
+
 class SuperNetBuilder:
     """ Build Trunk Blocks
     """
@@ -47,7 +50,6 @@ class SuperNetBuilder:
         self.drop_path_rate = drop_path_rate
         self.feature_location = feature_location
         assert feature_location in ('pre_pwl', 'post_exp', '')
-        self.verbose = verbose
         self.resunit = resunit
         self.dil_conv = dil_conv
         self.logger = logger
@@ -61,7 +63,8 @@ class SuperNetBuilder:
             self.channel_multiplier,
             self.channel_divisor,
             self.channel_min)
-
+    
+    # block = self._make_block(block_args, choice_idx, total_block_idx, total_block_count)
     def _make_block(
             self,
             ba,
@@ -87,27 +90,29 @@ class SuperNetBuilder:
         if bt == 'ir':
             ba['drop_path_rate'] = drop_path_rate
             ba['se_kwargs'] = self.se_kwargs
-            if self.verbose:
-                self.logger.info(
+            if print_log and model_log:
+                print(
                     '  InvertedResidual {}, Args: {}'.format(
                         block_idx, str(ba)))
             block = InvertedResidual(**ba)
         elif bt == 'ds' or bt == 'dsa':
             ba['drop_path_rate'] = drop_path_rate
             ba['se_kwargs'] = self.se_kwargs
-            if self.verbose:
-                self.logger.info(
+            if print_log and model_log:
+                print(
                     '  DepthwiseSeparable {}, Args: {}'.format(
                         block_idx, str(ba)))
             block = DepthwiseSeparableConv(**ba)
         elif bt == 'cn':
-            if self.verbose:
-                self.logger.info(
+            if print_log and model_log:
+                print(
                     '  ConvBnAct {}, Args: {}'.format(
                         block_idx, str(ba)))
             block = ConvBnAct(**ba)
         else:
             assert False, 'Uknkown block type (%s) while building model.' % bt
+        if print_log and model_log:
+            print()
         if choice_idx == self.choice_num - 1:
             self.in_chs = ba['out_chs']  # update in_chs for arg of next block
 
@@ -122,10 +127,11 @@ class SuperNetBuilder:
         Return:
              List of block stacks (each stack wrapped in nn.Sequential)
         """
-        if self.verbose:
-            logging.info('Building model trunk with %d stages...' % len(model_block_args))
+        if print_log:
+            print('Building model trunk with %d stages...' % len(model_block_args))
         self.in_chs = in_chs
         total_block_count = sum([len(x) for x in model_block_args])
+        print('total_block_count: {}'.format(total_block_count))
         total_block_idx = 0
         current_stride = 2
         current_dilation = 1
@@ -134,16 +140,16 @@ class SuperNetBuilder:
         # outer list of block_args defines the stacks ('stages' by some conventions)
         for stage_idx, stage_block_args in enumerate(model_block_args):
             last_stack = stage_idx == (len(model_block_args) - 1)
-            if self.verbose:
-                self.logger.info('Stack: {}'.format(stage_idx))
+            if print_log:
+                print('Stack: {}'.format(stage_idx))
             assert isinstance(stage_block_args, list)
 
             # blocks = []
             # each stack (stage) contains a list of block arguments
             for block_idx, block_args in enumerate(stage_block_args):
                 last_block = block_idx == (len(stage_block_args) - 1)
-                if self.verbose:
-                    self.logger.info(' Block: {}'.format(block_idx))
+                if print_log:
+                    print(' Block: {}'.format(block_idx))
 
                 # Sort out stride, dilation, and feature extraction details
                 assert block_args['stride'] in (1, 2)
@@ -183,6 +189,8 @@ class SuperNetBuilder:
                         # create the block
                         block_args = deepcopy(block_args_copy)
                         block_args = modify_block_args(block_args, choice[0], choice[1])
+                        if print_log:
+                            print('  idx {}, choice {}'.format(choice_idx,str(choice)))
                         block = self._make_block(block_args, choice_idx, total_block_idx, total_block_count)
                         choice_blocks.append(block)
                     if self.dil_conv:

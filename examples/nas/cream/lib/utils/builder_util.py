@@ -1,5 +1,7 @@
 import math
 import torch.nn as nn
+import re
+from copy import deepcopy
 
 from timm.utils import *
 from timm.models.layers.activations import Swish
@@ -26,6 +28,7 @@ def decode_arch_def(
         for block_str in block_strings:
             assert isinstance(block_str, str)
             ba, rep = decode_block_str(block_str)
+            print(ba)
             if ba.get('num_experts', 0) > 0 and experts_multiplier > 1:
                 ba['num_experts'] *= experts_multiplier
             stack_args.append(ba)
