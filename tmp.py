@@ -209,12 +209,13 @@ def satisfaction(flops_dict,max_flops,upper_bound):
         y_true.append(1 if flops/1e6 < max_flops else 0)
         y_pred.append(pred(rand,upper_bound))
     # print(y_true,y_pred)
-    acc = metrics.accuracy_score(y_true,y_pred)
+    precision = metrics.precision_score(y_true,y_pred)
     recall = metrics.recall_score(y_true,y_pred)
     f1 = metrics.f1_score(y_true,y_pred)
     cm = metrics.confusion_matrix(y_true, y_pred)
-    print('acc {:.4f}, recall {:.4f}, f1 {:.4f}'.format(acc,recall,f1))
+    print('precision {:.4f}, recall {:.4f}, f1 {:.4f}'.format(precision,recall,f1))
     print('{}'.format(cm))
+    return f1
 
 def visual(flops_dict):
     max_flops = 400
@@ -324,40 +325,36 @@ def cal_var(flops_dict,max_flops,rate):
         tmp = copy.deepcopy(stand)
         for i in range(purn_num):
             tmp[item[i]]=value_list[i]
-
-        upper_bound_list.append(tmp)
+        idx_num = 0
+        for idx in range(block_num*2):
+            if tmp[idx] != stand[idx]:
+                idx_num += 1
+        if idx_num == purn_num:
+            upper_bound_list.append(tmp)
+    upper_bound_list = [list(t) for t in set(tuple(_) for _ in upper_bound_list)]
     print('=======================================')
     print('purn_index {}'.format(purn_index))
     print('max_flops:{}, rate:{}'.format(max_flops,rate)) 
-    # for i in upper_bound_list:
-    #     print('upper_bound_list {}'.format(i))
-    upper_bound_list = [list(t) for t in set(tuple(_) for _ in upper_bound_list)]
-    satisfaction(flops_dict,max_flops,upper_bound_list)
-    # print('raw')
-    # l = []
-    # l.append(upper_bound)
-    # satisfaction(flops_dict,max_flops,l)
+    print('choice:{}'.format(len(upper_bound_list)))
+    for i in upper_bound_list:
+        print('upper_bound_list {}'.format(i))
+    f1 = satisfaction(flops_dict,max_flops,upper_bound_list)
+    return f1,len(upper_bound_list)
 
 
 
 if __name__ == '__main__':
-    # coefficient(16, 24, 112, 2, 0.25)
-    # satisfaction(flops_table(),450)
-    # flops_dict = flops_table()
-    # print(flops_dict)
-    # d = {}
-    # for idx,item in enumerate(flops_dict):
-    #     tmp1 = []
-    #     tmp2 = []
-    #     for idx1,item1 in enumerate(flops_dict):
-    #         if item == item1:
-    #             tmp1.append(2*idx1)
-    #             tmp2.append(2*idx1+1)
-    #     d[2*idx] = tmp1
-    #     d[2*idx+1] = tmp2
-    # print(d)
-    # p = [1.1,1.125,1.15,1.175,1.2,1.225,1.25]
-    p = [1.175]
-    for i in p:
-        cal_var(flops_table(),400,i)
-    # visual(flops_table())
+    p = [1.25]
+    f1 = 0
+    choice = 0
+    bestp=0
+    for _ in range(10):
+        for i in p:
+            tmp,tmp2 = cal_var(flops_table(),450,i)
+            if tmp > f1:
+                f1 = tmp
+                choice = tmp2
+                bestp = i
+    print('best f1:{}, choice:{}, p:{}'.format(f1,choice,bestp))
+
+# 450 1.25
