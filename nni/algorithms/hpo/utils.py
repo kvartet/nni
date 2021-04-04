@@ -2,6 +2,7 @@ import numpy as np
 
 from scipy.special import erf
 
+
 class RandomNumberGenerator():
     def __init__(self):
         np.random.seed(7)
@@ -16,10 +17,8 @@ class RandomNumberGenerator():
         return np.random.gauss(mu, sigma)
 
     def categorical(possibility, size=1):
-        if size == 1:
-            return np.random.choice(possibility, size).item()
-        else:
-            return np.random.choice(possibility, size)
+        return np.random.choice(possibility, size).item() if size == 1\
+            else np.random.choice(possibility, size)
 
 
 def linear_forgetting_weights(N, LF):
@@ -93,6 +92,8 @@ def adaptive_parzen_normal(mus, prior_weight, prior_mu, prior_sigma):
     return weights, mus, sigma
 
 # TODO
+
+
 def GMM1(weights, mus, sigmas, low=None, high=None, q=None, rng=None, size=()):
     """Sample from truncated 1-D Gaussian Mixture Model"""
     weights, mus, sigmas = list(map(np.asarray, (weights, mus, sigmas)))
@@ -155,7 +156,8 @@ def GMM1_lpdf(samples, weights, mus, sigmas, low=None, high=None, q=None):
         p_accept = 1
     else:
         p_accept = np.sum(
-            weights * (normal_cdf(high, mus, sigmas) - normal_cdf(low, mus, sigmas))
+            weights * (normal_cdf(high, mus, sigmas) -
+                       normal_cdf(low, mus, sigmas))
         )
 
     if q is None:
@@ -189,7 +191,6 @@ def GMM1_lpdf(samples, weights, mus, sigmas, low=None, high=None, q=None):
     return rval
 
 
-
 def normal_cdf(x, mu, sigma):
     top = x - mu
     bottom = np.maximum(np.sqrt(2) * sigma, EPS)
@@ -199,7 +200,6 @@ def normal_cdf(x, mu, sigma):
 
 def normal_lpdf():
     pass
-
 
 
 def lognormal_lpdf(x, mu, sigma):
@@ -212,6 +212,7 @@ def lognormal_lpdf(x, mu, sigma):
     rval = -E - np.log(Z)
     return rval
 
+
 def qlognormal_lpdf(x, mu, sigma, q):
     # casting rounds up to nearest step multiple.
     # so lpdf is log of integral from x-step to x+1 of P(x)
@@ -220,7 +221,7 @@ def qlognormal_lpdf(x, mu, sigma, q):
     return np.log(lognormal_cdf(x, mu, sigma) - lognormal_cdf(x - q, mu, sigma))
 
 
-def logsum_rows(x): # logsum
+def logsum_rows(x):  # logsum
     m = x.max(axis=1)
     return np.log(np.exp(x - m[:, None]).sum(axis=1)) + m
 

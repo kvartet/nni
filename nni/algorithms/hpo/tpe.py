@@ -92,7 +92,7 @@ class SearchSpace():
             self.pipelines.append(pipeline)
             for algo_kv in pipeline_json["_value"]:
                 pipeline.append(algo_kv["_name"])
-                algo = []
+                algo = list()
                 self.algorithms[algo_kv["_name"]] = algo
 
                 for param_kv in list(algo_kv.items())[1:]:
@@ -202,7 +202,7 @@ class TPETuner(Tuner):
                                               param_range.high, param_range.is_log_distributed,
                                               param_range.is_integer)
                         param[param_range.tag] = x
-                        formatted_algo[param_range.name] = param_range.is_integer ? str(int(x)): str(x)
+                        formatted_algo[param_range.name] = param_range.is_integer if str(int(x)) else str(x)
 
         return formatted_param, param
 
