@@ -15,7 +15,7 @@ from nni import ClassArgsValidator
 from nni.tuner import Tuner
 from nni.utils import NodeType, OptimizeMode, extract_scalar_reward, split_index
 
-logger = logging.getLogger('hyperopt_AutoML')
+logger = logging.getLogger(__name__)
 
 
 def json2space(in_x, name=NodeType.ROOT):
@@ -30,6 +30,7 @@ def json2space(in_x, name=NodeType.ROOT):
         name could be NodeType.ROOT, NodeType.TYPE, NodeType.VALUE or NodeType.INDEX, NodeType.NAME.
     """
     out_y = copy.deepcopy(in_x)
+    # print('in_x:{}'.format(in_x))
     if isinstance(in_x, dict):
         if NodeType.TYPE in in_x.keys():
             _type = in_x[NodeType.TYPE]
@@ -56,12 +57,20 @@ def json2space(in_x, name=NodeType.ROOT):
                         '\'_name\' key is not found in this nested search space.'
                     )
             out_y.append(json2space(x_i, name + '[%d]' % i))
+            # if isinstance(x_i, dict):
+            #     out_y.append(json2space(x_i, name))
+            #     # print('inner:{}, x_i:{}'.format(name, x_i))
+            # else:
+            #     out_y.append(json2space(x_i, name + '[%d]' % i))
+            #     # print('inner:{}, x_i:{}'.format(name + '[%d]' % i,x_i))
     return out_y
+
 
 
 def json2parameter(in_x, parameter, name=NodeType.ROOT):
     """
     Change json to parameters.
+    把sample出来的结果转成带index的正常的search space的形式
     """
     out_y = copy.deepcopy(in_x)
     if isinstance(in_x, dict):
@@ -249,11 +258,13 @@ class HyperoptTuner(Tuner):
         self.json = search_space
 
         search_space_instance = json2space(self.json)
+        print('search_space_instance:{}'.format(search_space_instance))
         rstate = np.random.RandomState()
         trials = hp.Trials()
         domain = hp.Domain(None,
                            search_space_instance,
                            pass_expr_memo_ctrl=None)
+
         algorithm = self._choose_tuner(self.algorithm_name)
         self.rval = hp.FMinIter(algorithm,
                                 domain,
@@ -261,6 +272,7 @@ class HyperoptTuner(Tuner):
                                 max_evals=-1,
                                 rstate=rstate,
                                 verbose=0)
+        print('domain:{}'.format(self.rval.domain.params))
         self.rval.catch_eval_exceptions = False
 
     def generate_parameters(self, parameter_id, **kwargs):
@@ -284,8 +296,8 @@ class HyperoptTuner(Tuner):
 
         if self.parallel:
             self.running_data.append(parameter_id)
-
         params = split_index(total_params)
+        print('generate_parameters, params:{}'.format(params))
         return params
 
     def receive_trial_result(self, parameter_id, parameters, value, **kwargs):
@@ -358,7 +370,9 @@ class HyperoptTuner(Tuner):
         out_y = dict()
         json2vals(self.json, vals, out_y)
         vals = out_y
+        print('receive result:{}'.format(vals))
         for key in domain.params:
+            print('key:{}'.format(key))
             if key in [NodeType.VALUE, NodeType.INDEX]:
                 continue
             if key not in vals or vals[key] is None or vals[key] == []:
@@ -367,12 +381,13 @@ class HyperoptTuner(Tuner):
                 idxs[key] = [new_id]
                 vals[key] = [vals[key]]
 
+        print('rval_miscs:{}, idxs:{}, new_id:{}'.format(rval_miscs, idxs,new_id))
         self.miscs_update_idxs_vals(rval_miscs,
                                     idxs,
                                     vals,
                                     idxs_map={new_id: new_id},
                                     assert_all_vals_used=False)
-
+        print('rval_specs:{}, rval_results:{}'.format(rval_specs, rval_results))
         trial = trials.new_trial_docs([new_id], rval_specs, rval_results,
                                       rval_miscs)[0]
         trial['result'] = {'loss': reward, 'status': 'ok'}
@@ -463,7 +478,16 @@ class HyperoptTuner(Tuner):
                 parameter[key] = None
 
         # remove '_index' from json2parameter and save params-id
+
+        # print('get_suggestion, parameter:{}'.format(parameter))
+        '''
+        把sample出来的结果转成带index的正常的search space的形式
+        get_suggestion, parameter:{'root[branch0]-choice': 0, 'root[branch0]-choice[0][degree]-choice': 3, 'root[branch0]-choice[0][kernel]-choice': 3, 'root[branch0]-choice[1][degree]-choice': None, 'root[branch0]-choice[1][kernel]-choice': None}
+        get_suggestion, total_params:{'branch0': {'_index': 0, '_value': {'_name': 'group1', 'kernel': {'_index': 3, '_value': 'sigmoid'}, 'degree': {'_index': 3, '_value': 4}}}}
+        '''
         total_params = json2parameter(self.json, parameter)
+        # print('get_suggestion, total_params:{}'.format(total_params))
+
         return total_params
 
     def import_data(self, data):
@@ -497,3 +521,35 @@ class HyperoptTuner(Tuner):
                                       parameters=_params,
                                       value=_value)
         logger.info("Successfully import data to TPE/Anneal tuner.")
+
+
+
+# search_space_instance:{'branch0': <hyperopt.pyll.base.Apply object at 0x7f04bc0cf250>}
+# rval.domain : <hyperopt.base.Domain object at 0x7f04bc0cf400>
+# get_suggestion, parameter:{'root[branch0]-choice': 0, 'root[branch0]-choice[0][degree]-choice': 3, 'root[branch0]-choice[0][kernel]-choice': 3, 'root[branch0]-choice[1][degree]-choice': None, 'root[branch0]-choice[1][kernel]-choice': None}
+# get_suggestion, total_params:{'branch0': {'_index': 0, '_value': {'_name': 'group1', 'kernel': {'_index': 3, '_value': 'sigmoid'}, 'degree': {'_index': 3, '_value': 4}}}}
+# generate_parameters, params:{'branch0': {'_name': 'group1', 'kernel': 'sigmoid', 'degree': 4}}
+
+
+
+# generate_parameters, params:{'branch0': {'_name': 'group1', 'kernel': 'poly', 'degree': 4}}
+# receive result:{'root[branch0]-choice': 0, 'root[branch0]-choice[0][kernel]-choice': 2, 'root[branch0]-choice[0][degree]-choice': 3}
+
+
+
+
+# generate_parameters, params:{'branch0': {'_name': 'group1', 'kernel': 'poly', 'degree': 3}}
+
+
+# receive result:{'root[branch0]-choice': 0, 'root[branch0]-choice[0][kernel]-choice': 2, 'root[branch0]-choice[0][degree]-choice': 2}
+
+
+# key:root[branch0]-choice
+# key:root[branch0]-choice[0][degree]-choice
+# key:root[branch0]-choice[0][kernel]-choice
+# key:root[branch0]-choice[1][degree]-choice
+# key:root[branch0]-choice[1][kernel]-choice
+
+
+# rval_miscs:[{'tid': 0, 'cmd': ('domain_attachment', 'FMinIter_Domain'), 'workdir': None}], idxs:{'root[branch0]-choice': [0], 'root[branch0]-choice[0][degree]-choice': [0], 'root[branch0]-choice[0][kernel]-choice': [0], 'root[branch0]-choice[1][degree]-choice': [], 'root[branch0]-choice[1][kernel]-choice': []}, new_id:0
+# rval_specs:[None], rval_results:[{'status': 'new'}]

@@ -1,6 +1,7 @@
 import copy
 import random
 import logging
+import collections
 
 import numpy as np
 
@@ -55,7 +56,8 @@ class ParameterRange():
     def __init__(self, name, algorithm_name, is_categorical, size,
                  categorical_values, low, high, is_log_distributed, is_integer):
         self.name = name
-        self.tag = algorithm_name + "|" + name
+        # self.tag = algorithm_name + "|" + name
+        self.tag = name
 
         self.is_categorical = is_categorical
 
@@ -85,13 +87,11 @@ class ParameterRange():
 
 class SearchSpace():
     def __init__(self, json_string):
-        self.algorithms = dict()
+        self.algorithms = collections.OrderedDict()
         self.pipelines = list()
         for pipeline_json in json_string.values():
-            pipeline = list()
-            self.pipelines.append(pipeline)
             for algo_kv in pipeline_json["_value"]:
-                pipeline.append(algo_kv["_name"])
+                self.pipelines.append(algo_kv["_name"])
                 algo = list()
                 self.algorithms[algo_kv["_name"]] = algo
 
@@ -126,7 +126,7 @@ class Result():
 
 
 class TPETuner(Tuner):
-    def __init__(self, search_space, minimize_mode=True):
+    def __init__(self, search_space, minimize_mode=False):
         self.n_startup_jobs = 20
         self.prior_weight = 1.0
         self.oloss_gamma = 0.25
@@ -135,7 +135,7 @@ class TPETuner(Tuner):
         self.eps = 1e-12
         self.rng = RandomNumberGenerator()
 
-        self.space = update_search_sapce(search_space)
+        self.space = SearchSpace(search_space)
         self.minimize = minimize_mode
 
         self.parameters = dict()  # Dictionary<int, TpeParameters>
@@ -144,20 +144,17 @@ class TPETuner(Tuner):
         self.lie = np.inf
 
     def generate_parameters(self, parameter_id):
-        ret = dict()  # Dictionary<string, AlgorithmParameters>
-        # AlgorithmParameters : Dictionary<string, string>
-        param = dict()  # TpeParameters : Dictionary<string, double>
         if (len(self.parameters) > self.n_startup_jobs and len(self.running) > 0):
             fake_history = copy.deepcopy(self.history)
             for item in self.running:
                 fake_history.append(
                     Result(len(fake_history), self.lie, self.parameters[item]))
-            ret, param = suggest(self.space, fake_history)
+            ret, param = self.suggest(self.space, fake_history)
         else:
-            ret, param = suggest(self.space, self.history)
+            ret, param = self.suggest(self.space, self.history)
 
         self.parameters[parameter_id] = param
-        self.running.append(parameter_id)
+        self.running.add(parameter_id)
 
         return ret
 
@@ -169,8 +166,7 @@ class TPETuner(Tuner):
         """
         return SearchSpace(search_space)
 
-
-    def receive_trial_result(self, parameter_id, parameters, loss, **kwargs):
+    def receive_trial_result(self, parameter_id, loss, **kwargs):
         if not self.minimize:
             loss = - loss
         self.running.remove(parameter_id)
@@ -178,39 +174,41 @@ class TPETuner(Tuner):
         self.history.append(
             Result(parameter_id, loss, self.parameters[parameter_id]))
 
-    def suggest(space, history):
+    def suggest(self, space, history):
         formatted_param = dict()
-        # Parameters : Dictionary<string, AlgorithmParameters>
-        # AlgorithmParameters : Dictionary<string, string>
         param = dict()  # Dictionary<string, double>
 
-        pipeline_index = suggest_categorical(
+        pipeline_index = self.suggest_categorical(
             history, "__pipeline__", len(self.space.pipelines))
         chosen_pipeline = self.space.pipelines[pipeline_index]
+        param["__pipeline__"] = pipeline_index
 
         for algo in self.space.algorithms.items():
             if algo[0] in chosen_pipeline:
                 formatted_algo = dict()
+                formatted_param[algo[0]] = formatted_algo
                 for param_range in algo[1]:
                     if param_range.is_categorical:
-                        index = suggest_categorical(
-                            history, param_range.tag, len(param_range))
+                        index = self.suggest_categorical(
+                            history, param_range.tag, param_range.size)
                         param[param_range.tag] = index
                         formatted_algo[param_range.name] = param_range.categorical_values[index]
                     else:
-                        x = suggest_numerical(history, param_range.tag, param_range.low,
-                                              param_range.high, param_range.is_log_distributed,
-                                              param_range.is_integer)
+                        x = self.suggest_numerical(history, param_range.tag, param_range.low,
+                                                   param_range.high, param_range.is_log_distributed,
+                                                   param_range.is_integer)
                         param[param_range.tag] = x
-                        formatted_algo[param_range.name] = param_range.is_integer if str(int(x)) else str(x)
-
+                        formatted_algo[param_range.name] = param_range.is_integer if str(
+                            int(x)) else str(x)
+        # print('formatted_param:{}, param:{}'.format(formatted_param, param))
         return formatted_param, param
 
     def suggest_categorical(self, history, tag, size):
-        if len(history) < self.n_startup_jobs:
-            return self.rng.integer(high)
 
-        obs_below, obs_above = ap_split_trials(history, tag)
+        if len(history) < self.n_startup_jobs:
+            return self.rng.integer(size)
+
+        obs_below, obs_above = self.ap_split_trials(history, tag)
 
         weights = linear_forgetting_weights(len(obs_below), self.lf)
         counts = bin_count(obs_below, weights, size)
@@ -223,7 +221,7 @@ class TPETuner(Tuner):
         p = (counts+self.prior_weight)/np.sum(counts+self.prior_weight)
         above_llik = np.log([p[i] for i in sample])
 
-        return find_best(sample, below_llik, above_llik)
+        return self.find_best(sample, below_llik, above_llik)
 
     def suggest_numerical(self, history, tag, low, high, log, integer):
         if len(history) < self.n_startup_jobs:
@@ -234,37 +232,38 @@ class TPETuner(Tuner):
                 x = round(x)
             return x
 
-        obs_below, obs_above = ap_split_trials(history, tag)
+        obs_below, obs_above = self.ap_split_trials(history, tag)
 
         if log:
-            obs_below = np.log(obs_below)
-            obs_above = np.log(obs_above)
+            obs_below, obs_above = np.log(obs_below), np.log(obs_above)
 
         prior_mu = 0.5 * (high + low)
         prior_sigma = high - low
 
-        weights, mus, sigmas = adaptive_parzen_normal(obs_below, prior_mu, prior_sigma)
-        samples = GMM1(weights, mus, sigmas, low, high, log, integer)
-        below_llik = GMM1_lpdf(samples, weights, mus, sigmas, low, high, log, integer)
+        weights, mus, sigmas = adaptive_parzen_normal(
+            obs_below, self.prior_weight, prior_mu, prior_sigma)
+        samples = Gmm1(weights, mus, sigmas, low, high, log,
+                       integer, self.n_ei_candidates, self.rng)
+        below_llik = Gmm1_lpdf(samples, weights, mus,
+                               sigmas, low, high, log, integer)
 
-        weights, mus, sigmas = adaptive_parzen_normal(obs_below, prior_mu, prior_sigma)
-        above_llik = GMM1_lpdf(samples, weights, mus, sigmas, low, high, log, integer)
-        
+        weights, mus, sigmas = adaptive_parzen_normal(
+            obs_below, self.prior_weight, prior_mu, prior_sigma)
+        above_llik = Gmm1_lpdf(samples, weights, mus,
+                               sigmas, low, high, log, integer)
+
         return find_best(samples, below_llik, above_llik)
 
-
     def ap_split_trials(self, history, tag):
-        n_below = min(int(np.ceil(self.oloss_gamma * np.sqrt(len(history)))), self.lf)
+        n_below = min(
+            int(np.ceil(self.oloss_gamma * np.sqrt(len(history)))), self.lf)
         history_sorted = sorted(history, key=lambda x: x.loss)
-        below = [item[:n_below] for item in history_sorted if tag in item.param.keys()]
-        above = [item[n_below:] for item in history_sorted if tag in item.param.keys()]
-        below_value = [item.param[tag] for item in sorted(below, key=lambda x: x.id)]
-        above_value = [item.param[tag] for item in sorted(above, key=lambda x: x.id)]
+        below = [item for item in history_sorted if tag in item.param.keys()][:n_below]
+        above = [item for item in history_sorted if tag in item.param.keys()][n_below:]
+        below_value = [item.param[tag] for item in sorted(below, key=lambda x: x.param_id)]
+        above_value = [item.param[tag] for item in sorted(above, key=lambda x: x.param_id)]
         return np.asarray(below_value), np.asarray(above_value)
-
 
     def find_best(self, samples, below_llik, above_llik):
         best = np.argmax(below_llik - above_llik)
         return samples[best]
-
-

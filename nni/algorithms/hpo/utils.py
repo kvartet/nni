@@ -7,32 +7,30 @@ class RandomNumberGenerator():
     def __init__(self):
         np.random.seed(7)
 
-    def integer(high):
-        return np.random.randint(0, high-1)
+    def integer(self, high):
+        return np.random.randint(0, high)
 
-    def uniform(low, high):
+    def uniform(self, low, high):
         return np.ramdom.uniform(low, high)
 
-    def normal(mu, sigma):
+    def normal(self, mu, sigma):
         return np.random.gauss(mu, sigma)
 
-    def categorical(possibility, size=1):
-        return np.random.choice(possibility, size).item() if size == 1\
-            else np.random.choice(possibility, size)
+    def categorical(self, possibility, size=1):
+        return np.argmax(np.random.multinomial(1, possibility, (size,)), axis=1)[0] if size==1 else np.argmax(np.random.multinomial(1, possibility, (size,)), axis=1)
 
 
-def linear_forgetting_weights(N, LF):
-    assert N >= 0
-    assert LF > 0
-    if N == 0:
-        return np.asarray([])
-    if N < LF:
-        return np.ones(N)
-    ramp = np.linspace(old_div(1.0, N), 1.0, num=N - LF)
-    flat = np.ones(LF)
-    weights = np.concatenate([ramp, flat], axis=0)
-    assert weights.shape == (N,), (weights.shape, N)
-    return weights
+def linear_forgetting_weights(n, lf):
+    weights = [1.0] * n
+    ramp_start = 1.0 / n
+    ramp_length= n - lf
+    if ramp_length == 1:
+        weights[0] = ramp_start
+    else:
+        for i in range(ramp_length):
+            weights[i] = ramp_start + (1.0 - ramp_start) / (ramp_length - 1) * i
+    return np.asarray(weights)
+
 
 
 def adaptive_parzen_normal(mus, prior_weight, prior_mu, prior_sigma):
@@ -64,8 +62,6 @@ def adaptive_parzen_normal(mus, prior_weight, prior_mu, prior_sigma):
         sigma[0] = lsigma
         sigma[-1] = usigma
 
-        # XXX: is sorting them necessary anymore?
-        # un-sort the mus and sigma
         mus[order] = mus.copy()
         sigma[order] = sigma.copy()
 
@@ -91,115 +87,104 @@ def adaptive_parzen_normal(mus, prior_weight, prior_mu, prior_sigma):
 
     return weights, mus, sigma
 
-# TODO
+
+def Gmm1(weights, mus, sigmas, low, high, log, integer, n_ei_candidates, rng):
+    samples = [0] * n_ei_candidates
+    for i in range(n_ei_candidates):
+        while True:
+            active = rng.categorical(weights)
+            draw = rng.normal(mus[active], sigmas[active])
+            if draw < low or draw >= high:
+                continue
+            if log:
+                draw = np.exp(draw)
+            if integer:
+                draw = np.round(draw)
+            samples[i] = draw
+            break
+        return np.asarray(samples)
+
+def Gmm1_lpdf(samples, weights, mus, sigmas, low, high, log, integer, rng):
+    print('unuseless')
+    return weights
+    # print()
+    # samples, weights, mus, sigmas = list(
+    #     map(np.asarray, (samples, weights, mus, sigmas))
+    # )
+
+    # assert len(weights) == len(mus) == len(sigmas)
+    # samples = _samples.flatten()
+
+    # p_accept = np.sum(
+    #     weights * (normal_cdf(high, mus, sigmas) -
+    #                 normal_cdf(low, mus, sigmas))
+    # )
+
+    # # ret = [0] * len(samples)
+    # # for i in range(len(samples)):
+    # if not integer:
+    #     if log:
+    #         ret = logsum_rows(lognormal_lpdf(samples, weights, mus, sigmas))
+    #     else:
+    #         ret = logsum_rows(lognormal_lpdf(samples, weights, mus, sigmas, p_accept))
+    # else:
+    #     prob = 0
+    #     if log:
+    #         ubound = np.log(np.minimum(samples + 0.5, np.exp(high)))
+    #         lbound = np.log(np.maximum(samples - 0.5, np.exp(low)))
+    #     else:
+    #         ubound = np.minimum(samples + 0.5, high)
+    #         lobund = np.maximum(samples - 0.5, low)
+    #     prob += np.sum(weights * normal_cdf(ubound, mus, sigmas))
+    #     prob -= np.sum(weights * normal_cdf(lbound, mus, sigmas)
+    #     ret = np.log(prob) - np.log(p_accept)
+
+    # return ret   
 
 
-def GMM1(weights, mus, sigmas, low=None, high=None, q=None, rng=None, size=()):
-    """Sample from truncated 1-D Gaussian Mixture Model"""
-    weights, mus, sigmas = list(map(np.asarray, (weights, mus, sigmas)))
-    assert len(weights) == len(mus) == len(sigmas)
-    n_samples = int(np.prod(size))
-    # n_components = len(weights)
-    if low is None and high is None:
-        # -- draw from a standard GMM
-        active = np.argmax(rng.multinomial(1, weights, (n_samples,)), axis=1)
-        samples = rng.normal(loc=mus[active], scale=sigmas[active])
-    else:
-        # -- draw from truncated components, handling one-sided truncation
-        low = float(low) if low is not None else -float("Inf")
-        high = float(high) if high is not None else float("Inf")
-        if low >= high:
-            raise ValueError("low >= high", (low, high))
-        samples = []
-        while len(samples) < n_samples:
-            active = np.argmax(rng.multinomial(1, weights))
-            draw = rng.normal(loc=mus[active], scale=sigmas[active])
-            if low <= draw < high:
-                samples.append(draw)
-    samples = np.reshape(np.asarray(samples), size)
-    if q is None:
-        return samples
-    return np.round(old_div(samples, q)) * q
+# def Gmm1_lpdf(samples, weights, mus, sigmas, low, high, log, integer, rng):
+#     samples, weights, mus, sigmas = list(
+#         map(np.asarray, (samples, weights, mus, sigmas))
+#     )
+
+#     assert len(weights) == len(mus) == len(sigmas)
+#     _samples = samples
+#     samples = _samples.flatten()
+
+#     p_accept = np.sum(
+#         weights * (normal_cdf(high, mus, sigmas) -
+#                     normal_cdf(low, mus, sigmas))
+#     )
+
+#     ret = [0] * len(samples)
+#     for i in range(len(samples)):
+#         if not integer:
+#             if log:
+#                 ret[i] = logsum_rows(lognormal_lpdf(samples[i], weights, mus, sigmas))
+#             else:
+#                 ret[i] = logsum_rows(lognormal_lpdf(samples[i], weights, mus, sigmas, p_accept))
+#         else:
+#             prob = 0
+#             if log:
+#                 ubound = np.log(np.min(samples[i] + 0.5, np.exp(high)))
+#                 lbound = np.log(np.max(samples[i] - 0.5, np.exp(low)))
+#             else:
+#                 ubound = np.min(samples[i] + 0.5, high)
+#                 lobund = np.max(samples[i] - 0.5, low)
+#             prob += np.sum(weights * normal_cdf(ubound, mus, sigmas))
+#             prob -= np.sum(weights * normal_cdf(lbound, mus, sigmas)
+#             ret[i] = np.log(prob) - np.log(p_accept)
+
+#     return np.asarray(ret)    
 
 
-# TODO
-def GMM1_lpdf(samples, weights, mus, sigmas, low=None, high=None, q=None):
-    def print_verbose(s, x):
-        return print(f"GMM1_lpdf:{s}", x)
-
-    verbose = 0
-    samples, weights, mus, sigmas = list(
-        map(np.asarray, (samples, weights, mus, sigmas))
-    )
-    if samples.size == 0:
-        return np.asarray([])
-    if weights.ndim != 1:
-        raise TypeError("need vector of weights", weights.shape)
-    if mus.ndim != 1:
-        raise TypeError("need vector of mus", mus.shape)
-    if sigmas.ndim != 1:
-        raise TypeError("need vector of sigmas", sigmas.shape)
-    assert len(weights) == len(mus) == len(sigmas)
-    _samples = samples
-    samples = _samples.flatten()
-
-    if verbose:
-        print_verbose("samples", set(samples))
-        print_verbose("weights", weights)
-        print_verbose("mus", mus)
-        print_verbose("sigmas", sigmas)
-        print_verbose("low", low)
-        print_verbose("high", high)
-        print_verbose("q", q)
-
-    if low is None and high is None:
-        p_accept = 1
-    else:
-        p_accept = np.sum(
-            weights * (normal_cdf(high, mus, sigmas) -
-                       normal_cdf(low, mus, sigmas))
-        )
-
-    if q is None:
-        dist = samples[:, None] - mus
-        mahal = (old_div(dist, np.maximum(sigmas, EPS))) ** 2
-        # mahal shape is (n_samples, n_components)
-        Z = np.sqrt(2 * np.pi * sigmas ** 2)
-        coef = weights / Z / p_accept
-        rval = logsum_rows(-0.5 * mahal + np.log(coef))
-    else:
-        prob = np.zeros(samples.shape, dtype="float64")
-        for w, mu, sigma in zip(weights, mus, sigmas):
-            if high is None:
-                ubound = samples + old_div(q, 2.0)
-            else:
-                ubound = np.minimum(samples + old_div(q, 2.0), high)
-            if low is None:
-                lbound = samples - old_div(q, 2.0)
-            else:
-                lbound = np.maximum(samples - old_div(q, 2.0), low)
-            # -- two-stage addition is slightly more numerically accurate
-            inc_amt = w * normal_cdf(ubound, mu, sigma)
-            inc_amt -= w * normal_cdf(lbound, mu, sigma)
-            prob += inc_amt
-        rval = np.log(prob) - np.log(p_accept)
-
-    if verbose:
-        print_verbose("rval:", dict(list(zip(samples, rval))))
-
-    rval.shape = _samples.shape
-    return rval
 
 
 def normal_cdf(x, mu, sigma):
-    top = x - mu
+    top = x - np.asarray(mu)
     bottom = np.maximum(np.sqrt(2) * sigma, EPS)
-    z = old_div(top, bottom)
+    z = 0.5 + 0.5 * erf(top/bottom)
     return 0.5 * (1 + erf(z))
-
-
-def normal_lpdf():
-    pass
 
 
 def lognormal_lpdf(x, mu, sigma):
@@ -229,5 +214,5 @@ def logsum_rows(x):  # logsum
 def bin_count(x, weights, min_length):
     ret = [0] * min_length
     for i in range(len(x)):
-        ret[(int)x[i]] += weights[i]
-    return ret
+        ret[x[i]] += weights[i]
+    return np.asarray(ret)
