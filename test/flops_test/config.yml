@@ -1,0 +1,19 @@
+# experimentName: 201_cifar100_TPE_100
+# experimentName: 201_cifar100_Anneal_100
+experimentName: 201_cifar100_Evolution_100
+searchSpaceFile: search.json
+trialCommand: python trial_code.py
+trialCodeDirectory: .
+trialGpuNumber: 1
+maxExperimentDuration: 1h
+maxTrialNumber: 100
+trialConcurrency: 1
+tuner:
+  # name: TPE
+  # name: Anneal
+  name: Evolution
+  classArgs:
+    optimize_mode: maximize
+trainingService:
+  platform: local
+  useActiveGpu: True
