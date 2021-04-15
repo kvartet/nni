@@ -16,6 +16,21 @@
 #     # printf "%s\t%s\n" "$[$i+1]" "${arr[$i]}"  
 # done 
 
+flops_list=(30 50 100)
+arr=(3 7 11)
+for flops in ${flops_list[@]}
+do
+echo $flops
+    for i in "${!arr[@]}";   
+    do
+        echo "run $[$i+1] begin, the rand seed is ${arr[$i]}, the flops is $flops"
+        python3 launch.py --main_file trial_code.py --seed ${arr[$i]} --search_space_path search.json --flops $flops --version $[$i+1] --situation aware
+        python3 launch.py --main_file "total_trial_code.py --flops $flops" --seed ${arr[$i]} --search_space_path total_search.json --flops 100 --version $[$i+1] --situation nonested
+    done 
+done
+
+
+
 python3 launch.py --main_file trial_code.py --seed 7 --search_space_path search.json --flops 100 --version 1 --situation aware
 
 python3 launch.py --main_file total_trial_code.py --seed 7 --search_space_path total_search.json --flops 100 --version 1 --situation nonested
