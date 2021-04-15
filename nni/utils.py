@@ -5,6 +5,7 @@ import copy
 import functools
 from enum import Enum, unique
 import json_tricks
+import numpy as np
 from schema import And
 
 from . import parameter_expressions
@@ -305,3 +306,61 @@ class ClassArgsValidator(object):
             And(keyType, error='%s should be %s type!' % (key, keyType.__name__)),
             And(lambda n: start <= n <= end, error='%s should be in range of (%s, %s)!' % (key, start, end))
         )
+
+def json2space2(search_space):
+    search_keys = []
+    if 'branch' in search_space.keys():
+        # nested
+        search_keys.append('branch')
+        for item in search_space['branch']['_value'][0].keys():
+            if item != '_name':
+                search_keys.append(item)
+    else:
+        # non nested
+        search_keys.extend(search_space.keys())
+    return search_keys
+
+def json2parameter2(search_space, is_rand, random_state, oldy):
+    config = dict()
+    if 'branch' in is_rand.keys():
+        # nested
+        branch_config = dict()
+        config_value = dict()
+        branch_values = search_space['branch']['_value']
+        if is_rand['branch']:
+            branch_index = random_state.randint(len(branch_values))
+        else:
+            branch_index = oldy['branch']['_index']
+        branch_config['_index'] = branch_index
+        branch_value = branch_values[branch_index]
+        config_value['_name'] = branch_value['_name']
+        is_rand.pop('branch')
+        for search_key, rand in is_rand.items():
+            config_item = dict()
+            _value = branch_value[search_key]['_value']
+            if not rand:
+                _index = oldy['branch']['_value'][search_key]['_index'] \
+                if oldy['branch']['_value'][search_key]['_index']<len(_value) else len(_value) - 1
+            else:
+                _index = random_state.randint(len(_value))
+            config_item['_index'] = _index
+            config_item['_value'] = _value[_index]
+            config_value[search_key] = config_item
+        branch_config['_value'] = config_value
+        config['branch'] = branch_config
+    else:
+        # non nested
+        for search_key, rand in is_rand.items():
+            config_item = dict()
+            _value = search_space[search_key]['_value']
+            if not rand:
+                # no random, maybe need to clip
+                _index = oldy[search_key]['_index'] if oldy[search_key]['_index'] < len(_value) else len(_value)-1
+            else:
+                _index = random_state.randint(len(_value))
+            config_item['_index'] = _index
+            config_item['_value'] = _value[_index]
+            config[search_key] = config_item    
+    return config   
+
+     

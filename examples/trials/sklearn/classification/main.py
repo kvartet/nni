@@ -51,12 +51,16 @@ def get_default_parameters():
 def get_model(PARAMS):
     '''Get model according to parameters'''
     model = SVC()
-    model.C = PARAMS.get('C')
-    model.kernel = PARAMS.get('kernel')
-    model.degree = PARAMS.get('degree')
-    model.gamma = PARAMS.get('gamma')
-    model.coef0 = PARAMS.get('coef0')
-
+    # model.C = PARAMS.get('C')
+    # model.kernel = PARAMS.get('kernel')
+    # model.degree = PARAMS.get('degree')
+    # model.gamma = PARAMS.get('gamma')
+    # model.coef0 = PARAMS.get('coef0')
+    model.C = 1.0
+    model.kernel = PARAMS["branch"].get('kernel')
+    model.degree = PARAMS["branch"].get('degree')
+    model.gamma = 0.01
+    model.coef0 = 0.01
     return model
 
 def run(X_train, X_test, y_train, y_test, model):
@@ -72,11 +76,11 @@ if __name__ == '__main__':
     try:
         # get parameters from tuner
         RECEIVED_PARAMS = nni.get_next_parameter()
-        LOG.debug(RECEIVED_PARAMS)
-        PARAMS = get_default_parameters()
-        PARAMS.update(RECEIVED_PARAMS)
-        LOG.debug(PARAMS)
-        model = get_model(PARAMS)
+        # LOG.debug(RECEIVED_PARAMS)
+        # PARAMS = get_default_parameters()
+        # PARAMS.update(RECEIVED_PARAMS)
+        # LOG.debug(PARAMS)
+        model = get_model(RECEIVED_PARAMS)
         run(X_train, X_test, y_train, y_test, model)
     except Exception as exception:
         LOG.exception(exception)

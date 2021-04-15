@@ -16,7 +16,7 @@ from schema import Schema, Optional
 import nni
 from nni import ClassArgsValidator
 from nni.tuner import Tuner
-from nni.utils import OptimizeMode, extract_scalar_reward, split_index, json2parameter, json2space
+from nni.utils import OptimizeMode, extract_scalar_reward, split_index, json2parameter, json2space, json2parameter2, json2space2
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ class EvolutionTuner(Tuner):
     EvolutionTuner is tuner using navie evolution algorithm.
     """
 
-    def __init__(self, optimize_mode="maximize", population_size=32):
+    def __init__(self, optimize_mode="maximize", population_size=32, seed=7):
         """
         Parameters
         ----------
@@ -75,6 +75,7 @@ class EvolutionTuner(Tuner):
         """
         self.optimize_mode = OptimizeMode(optimize_mode)
         self.population_size = population_size
+        self.seed = seed
 
         self.searchspace_json = None
         self.running_trials = {}
@@ -99,7 +100,7 @@ class EvolutionTuner(Tuner):
         self.searchspace_json = search_space
         self.space = json2space(self.searchspace_json)
 
-        self.random_state = np.random.RandomState()
+        self.random_state = np.random.RandomState(self.seed)
         self.population = []
 
         for _ in range(self.population_size):
@@ -124,6 +125,7 @@ class EvolutionTuner(Tuner):
         if not success:
             self.running_trials.pop(parameter_id)
             self._random_generate_individual()
+            print('fail...')
 
         if self.credit > 1:
             param_id = self.param_ids.popleft()
@@ -171,6 +173,7 @@ class EvolutionTuner(Tuner):
             is_rand[item] = True
 
         config = json2parameter(self.searchspace_json, is_rand, self.random_state)
+        # print('_random_generate_individual.config:{}'.format(config))
         self.population.append(Individual(config=config))
 
     def _generate_individual(self, parameter_id):
@@ -206,15 +209,30 @@ class EvolutionTuner(Tuner):
                 self.population[0] = self.population[1]
 
             # mutation on the worse individual
-            space = json2space(self.searchspace_json,
-                               self.population[0].config)
-            is_rand = dict()
-            mutation_pos = space[random.randint(0, len(space)-1)]
+            # space = json2space(self.searchspace_json,
+            #                    self.population[0].config)
+            # is_rand = dict()
+            # mutation_pos = space[random.randint(0, len(space)-1)]
 
-            for i in range(len(self.space)):
-                is_rand[self.space[i]] = (self.space[i] == mutation_pos)
-            config = json2parameter(
-                self.searchspace_json, is_rand, self.random_state, self.population[0].config)
+            # for i in range(len(self.space)):
+            #     is_rand[self.space[i]] = (self.space[i] == mutation_pos)
+            # # print('is_rand:{}'.format(is_rand))
+            # # print('self.population[0].config:{}'.format(self.population[0].config))
+            # config = json2parameter(
+            #     self.searchspace_json, is_rand, self.random_state, self.population[0].config)
+            # # print('_generate_individual.config:{}'.format(config))
+
+            space = json2space2(self.searchspace_json)
+            is_rand = dict()
+
+            mutation_pos = space[random.randint(0, len(space)-1)]
+            for i in range(len(space)):
+                is_rand[space[i]] = (space[i] == mutation_pos)
+            # print('is_rand:{}'.format(is_rand))
+            # print('self.population[0].config:{}'.format(self.population[0].config))
+            config = json2parameter2(self.searchspace_json, is_rand, self.random_state, self.population[0].config)
+            # print('_generate_individual.config:{}'.format(config))
+
 
             if len(self.population) > 1:
                 self.population.pop(1)

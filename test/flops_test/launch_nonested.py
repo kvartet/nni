@@ -21,18 +21,18 @@ experiment.config.trial_command = 'python3 total_trial_code.py'
 experiment.start(8476)
 
 
-while True:
-    time.sleep(120)
-    if experiment.get_status() == 'DONE':
-        data_list = []
-        for item in experiment.get_job_metrics().values():
-            data_list.append(item[0].data)
+# while True:
+#     time.sleep(120)
+#     if experiment.get_status() == 'DONE':
+#         data_list = []
+#         for item in experiment.get_job_metrics().values():
+#             data_list.append(item[0].data)
 
-        df = pd.read_csv('results/tpe_nonested.csv', low_memory=False)
-        # df = pd.DataFrame()
-        df[experiment.get_experiment_profile()['params']['experimentName']] = data_list
+#         df = pd.read_csv('results/tpe_nonested.csv', low_memory=False)
+#         # df = pd.DataFrame()
+#         df[experiment.get_experiment_profile()['params']['experimentName']] = data_list
 
-        df.to_csv('results/tpe_nonested.csv', index=0, header=1)
+#         df.to_csv('results/tpe_nonested.csv', index=0, header=1)
         
-        experiment.stop()
-        break
+#         experiment.stop()
+#         break

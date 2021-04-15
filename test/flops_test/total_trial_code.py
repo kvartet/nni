@@ -7,7 +7,7 @@ def main(arch):
         # nni.report_final_result(t["test_acc"])
         # pprint.pprint(t)
         # print(t)
-        if t["flops"] > 50:
+        if t["flops"] > 100:
             nni.report_final_result(0.001)
             print('acc = 0')
             print('flops = {}'.format(t["flops"]))

@@ -75,6 +75,6 @@ def flops_100(d):
     print(len(d['branch']['_value']))
     return d
         
-json_str = json.dumps(flops_50(branch), indent=4)
+json_str = json.dumps(flops_100(branch), indent=4)
 with open('search.json', 'w') as json_file:
     json_file.write(json_str)

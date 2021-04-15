@@ -278,6 +278,9 @@ class HyperoptTuner(Tuner):
         total_params = self.get_suggestion(random_search=False)
         # avoid generating same parameter with concurrent trials because hyperopt doesn't support parallel mode
         if total_params in self.total_data.values():
+            k = list(self.total_data.keys())[list(self.total_data.values()).index(total_params)]
+            print('dup key:{}'.format(k))
+            print('total_params:{}'.format(total_params))
             # but it can cause duplicate parameter rarely
             total_params = self.get_suggestion(random_search=True)
         self.total_data[parameter_id] = total_params
@@ -462,7 +465,7 @@ class HyperoptTuner(Tuner):
             except (KeyError, IndexError):
                 parameter[key] = None
 
-        # remove '_index' from json2parameter and save params-id
+        # need to remove '_index' from json2parameter and save params-id
         total_params = json2parameter(self.json, parameter)
         return total_params
 
