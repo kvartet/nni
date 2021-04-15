@@ -1,5 +1,6 @@
 import json
 from itertools import combinations
+import argparse
 
 branch = {
     "branch": {
@@ -74,7 +75,13 @@ def flops_100(d):
         d['branch']['_value'].append(dict(tmp))
     print(len(d['branch']['_value']))
     return d
-        
-json_str = json.dumps(flops_100(branch), indent=4)
+
+parser = argparse.ArgumentParser(description='controller')
+parser.add_argument('--flops', type=int, default='100')
+args = parser.parse_args()
+
+
+json_str = json.dumps(globals().get('flops_%s' % args.flops)(branch), indent=4)
+# json_str = json.dumps(flops_100(branch), indent=4)
 with open('search.json', 'w') as json_file:
     json_file.write(json_str)

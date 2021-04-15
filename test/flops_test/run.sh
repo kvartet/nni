@@ -16,11 +16,12 @@
 #     # printf "%s\t%s\n" "$[$i+1]" "${arr[$i]}"  
 # done 
 
-flops_list=(30 50 100)
+flops_list=(100 50 30)
 arr=(3 7 11)
 for flops in ${flops_list[@]}
 do
-echo $flops
+echo "generate $flops file..."
+python3 generator.py --flops $flops
     for i in "${!arr[@]}";   
     do
         echo "run $[$i+1] begin, the rand seed is ${arr[$i]}, the flops is $flops"
