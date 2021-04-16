@@ -30,7 +30,7 @@ experiment.config.search_space_file = (args.search_space_path)
 experiment.config.trial_command = 'python3 '+args.main_file
 # experiment.config.experiment_working_directory = '~/nni-experiments/' 
 
-experiment.start(8475)
+experiment.start(8741)
 
 while True:
     time.sleep(120)
@@ -48,6 +48,10 @@ while True:
             df = pd.read_csv('results/evolution_nonested.csv', low_memory=False)
             df[experiment.get_experiment_profile()['params']['experimentName']] = data_list
             df.to_csv('results/evolution_nonested.csv', index=0, header=1)
+        elif args.situation == 'noaware':
+            df = pd.read_csv('results/evolution_noaware.csv', low_memory=False)
+            df[experiment.get_experiment_profile()['params']['experimentName']] = data_list
+            df.to_csv('results/evolution_noaware.csv', index=0, header=1)
         
         experiment.stop()
         break
