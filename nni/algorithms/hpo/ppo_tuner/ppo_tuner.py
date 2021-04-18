@@ -217,7 +217,7 @@ class PPOModel:
     def compute_rewards(self, trials_info, trials_result):
         """
         Compute the rewards of the trials in trials_info based on trials_result,
-        and update the rewards in trials_info
+        and update the rewards in trials_infos
 
         Parameters
         ----------
@@ -310,7 +310,7 @@ class PPOTuner(Tuner):
     It uses ``lstm`` for its policy network and value network, policy and value share the same network.
     """
 
-    def __init__(self, optimize_mode, trials_per_update=20, epochs_per_update=4, minibatch_size=4,
+    def __init__(self, optimize_mode='maximize', trials_per_update=20, epochs_per_update=4, minibatch_size=4,
                  ent_coef=0.0, lr=3e-4, vf_coef=0.5, max_grad_norm=0.5, gamma=0.99, lam=0.95, cliprange=0.2):
         """
         Initialization, PPO model is not initialized here as search space is not received yet.
@@ -348,6 +348,7 @@ class PPOTuner(Tuner):
         self.inf_batch_size = trials_per_update   # number of trials to generate in one inference
         self.first_inf = True                     # indicate whether it is the first time to inference new trials
         self.trials_result = [None for _ in range(self.inf_batch_size)] # results of finished trials
+        self.is_nested = False
 
         self.credit = 0 # record the unsatisfied trial requests
         self.param_ids = []
@@ -368,33 +369,36 @@ class PPOTuner(Tuner):
         self.send_trial_callback = None
         logger.info('Finished PPOTuner initialization')
 
-    def _process_nas_space(self, search_space):
+    def _process_nas_space(self, search_space, is_nested):
         actions_spaces = []
         actions_to_config = []
-        for key, val in search_space.items():
-            if val['_type'] == 'layer_choice':
-                actions_to_config.append((key, 'layer_choice'))
-                actions_spaces.append(val['_value'])
+        if not is_nested:
+            for key, val in search_space.items():
+                if val['_type'] == 'choice':
+                    actions_to_config.append((key, 'choice'))
+                    actions_spaces.append(val['_value'])
+                    self.chosen_arch_template[key] = None
+                else:
+                    raise ValueError('Unsupported search space type: %s' % (val['_type']))
+        else:
+            actions_to_config.append(('branch', 'choice'))
+            actions_spaces.append([i for i in range(len(search_space['branch']['_value']))])
+            self.chosen_arch_template['branch'] = None
+            self.dims = []
+            for items in search_space['branch']['_value']:
+                choice, dim = copy.deepcopy(items), []
+                del choice['_name']
+                for item in choice.values():
+                    dim.append(len(item['_value']))
+                self.dims.append(dim)
+            self.max_dim = np.max(self.dims, axis=0)
+            self.max_dim_idx = np.argmax(self.dims, axis=0)
+            keys = list(search_space['branch']['_value'][0].keys())[1:]
+            assert len(keys) == len(self.max_dim) == len(self.max_dim_idx)
+            for idx, key in enumerate(keys):
+                actions_to_config.append((key, 'choice'))
+                actions_spaces.append(search_space['branch']['_value'][self.max_dim_idx[idx]][key]['_value'])
                 self.chosen_arch_template[key] = None
-            elif val['_type'] == 'input_choice':
-                candidates = val['_value']['candidates']
-                n_chosen = val['_value']['n_chosen']
-                if n_chosen not in [0, 1, [0, 1]]:
-                    raise ValueError('Optional_input_size can only be 0, 1, or [0, 1], but the pecified one is %s'
-                                     % (n_chosen))
-                if isinstance(n_chosen, list):
-                    actions_to_config.append((key, 'input_choice'))
-                    # FIXME: risk, candidates might also have None
-                    actions_spaces.append(['None', *candidates])
-                    self.chosen_arch_template[key] = None
-                elif n_chosen == 1:
-                    actions_to_config.append((key, 'input_choice'))
-                    actions_spaces.append(candidates)
-                    self.chosen_arch_template[key] = None
-                elif n_chosen == 0:
-                    self.chosen_arch_template[key] = []
-            else:
-                raise ValueError('Unsupported search space type: %s' % (val['_type']))
 
         # calculate observation space
         dedup = {}
@@ -452,7 +456,10 @@ class PPOTuner(Tuner):
         assert self.model_config.observation_space is None
         assert self.model_config.action_space is None
 
-        self.actions_spaces, self.actions_to_config, self.full_act_space, obs_space, nsteps = self._process_nas_space(search_space)
+        if 'branch' in search_space.keys():
+            self.is_nested = True
+            
+        self.actions_spaces, self.actions_to_config, self.full_act_space, obs_space, nsteps = self._process_nas_space(search_space, self.is_nested)
 
         self.model_config.observation_space = spaces.Discrete(obs_space)
         self.model_config.action_space = spaces.Discrete(obs_space)
@@ -466,24 +473,37 @@ class PPOTuner(Tuner):
 
     def _actions_to_config(self, actions):
         """
+        actions : dim = num of elements needed to select
         Given actions, to generate the corresponding trial configuration
         """
-        chosen_arch = copy.deepcopy(self.chosen_arch_template)
-        for cnt, act in enumerate(actions):
-            act_name = self.full_act_space[act]
-            (_key, _type) = self.actions_to_config[cnt]
-            if _type == 'input_choice':
-                if act_name == 'None':
-                    chosen_arch[_key] = {'_value': [], '_idx': []}
+        chosen_arch = copy.deepcopy(self.chosen_arch_template) # inlcuding all keys, in nested search space, also including branch
+        if not self.is_nested:
+            for cnt, act in enumerate(actions):
+                act_name = self.full_act_space[act]
+                (_key, _type) = self.actions_to_config[cnt]
+                if _type == 'layer_choice' or _type == 'choice':
+                    idx = self.search_space[_key]['_value'].index(act_name)
+                    chosen_arch[_key] = {'_value': act_name, '_idx': idx}
                 else:
-                    candidates = self.search_space[_key]['_value']['candidates']
-                    idx = candidates.index(act_name)
-                    chosen_arch[_key] = {'_value': [act_name], '_idx': [idx]}
-            elif _type == 'layer_choice':
-                idx = self.search_space[_key]['_value'].index(act_name)
-                chosen_arch[_key] = {'_value': act_name, '_idx': idx}
-            else:
-                raise ValueError('unrecognized key: {0}'.format(_type))
+                    raise ValueError('unrecognized key: {0}'.format(_type))
+        else:
+            actionss = copy.deepcopy(actions)
+            choose_branch = None
+            for cnt, act in enumerate(actionss):
+                if cnt == 0:
+                    assert self.actions_to_config[act][0] == 'branch'
+                    chosen_arch['branch'] = {'_value': act, '_idx': act}
+                    choose_branch = act
+                else:
+                    # FIXME
+                    act = np.clip(act, len(self.actions_spaces[0], (len(self.actions_spaces[0] + self.dims[choose_branch][cnt-1] - 1))
+                    act_name = self.full_act_space[act]
+                    (_key, _type) = self.actions_to_config[cnt]
+                    if _type == 'layer_choice' or _type == 'choice':
+                        idx = self.search_space['branch']['_value'][choose_branch][_key]['_value'].index(act_name)
+                        chosen_arch[_key] = {'_value': act_name, '_idx': idx}
+                    else:
+                        raise ValueError('unrecognized key: {0}'.format(_type))
         return chosen_arch
 
     def generate_multiple_parameters(self, parameter_id_list, **kwargs):
@@ -537,6 +557,9 @@ class PPOTuner(Tuner):
         if self.first_inf:
             self.trials_result = [None for _ in range(self.inf_batch_size)]
             mb_obs, mb_actions, mb_values, mb_neglogpacs, mb_dones, last_values = self.model.inference(self.inf_batch_size)
+            print('first generate_parameters....')
+            print('mb_obs:{}, mb_actions:{}, mb_values:{}, mb_neglogpacs:{}, mb_dones:{}, last_values:{}'\
+                .format(mb_obs, mb_actions, mb_values, mb_neglogpacs, mb_dones, last_values))
             self.trials_info = TrialsInfo(mb_obs, mb_actions, mb_values, mb_neglogpacs,
                                           mb_dones, last_values, self.inf_batch_size)
             self.first_inf = False
@@ -548,8 +571,9 @@ class PPOTuner(Tuner):
             self.param_ids.append(parameter_id)
             raise nni.NoMoreTrialError('no more parameters now.')
 
-        self.running_trials[parameter_id] = trial_info_idx
+        self.running_trials[parameter_id] = trial_info_idx # 显示是trial的第几个
         new_config = self._actions_to_config(actions)
+        print('new_config:{}'.format(new_config))
         return new_config
 
     def _next_round_inference(self):
@@ -564,6 +588,13 @@ class PPOTuner(Tuner):
         # generate new trials
         self.trials_result = [None for _ in range(self.inf_batch_size)]
         mb_obs, mb_actions, mb_values, mb_neglogpacs, mb_dones, last_values = self.model.inference(self.inf_batch_size)
+
+        # FIXME: should clip in output 
+        # for i in range(self.inf_batch_size):
+        #     mb_obs[1, i] = np.clip(mb_obs[1, i], 0, self.max_dim[i]-1)
+        #     mb_actions[0, i] = np.clip(mb_actions[0, i], 0, self.max_dim[i]-1)
+        #     mb_actions[1, i] = np.clip(mb_actions[1, i], 0, self.max_dim[i]-1)
+
         self.trials_info = TrialsInfo(mb_obs, mb_actions,
                                       mb_values, mb_neglogpacs,
                                       mb_dones, last_values,
