@@ -5,7 +5,7 @@ import argparse
 
 def main(arch):
     parser = argparse.ArgumentParser(description='controller')
-    parser.add_argument('--flops', type=int, default='0')
+    parser.add_argument('--flops', type=int, default='100')
     args = parser.parse_args()
     
     for t in query_nb201_trial_stats(arch, 200, 'cifar100','mean'):

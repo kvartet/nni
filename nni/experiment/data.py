@@ -83,7 +83,7 @@ class TrialHyperParameters:
     parameter_id: int
     parameter_source: str
     parameters: dict
-    parameter_index: int
+    parameter_index: int = 0
 
 
 @dataclass
