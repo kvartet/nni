@@ -31,6 +31,7 @@ experiment.config.search_space_file = (args.search_space_path)
 experiment.config.trial_command = 'python3 '+args.main_file
 experiment.config.training_service.use_active_gpu = True
 experiment.config.training_service.gpu_indices = '1'
+experiment.config.debug = True
 # experiment.config.experiment_working_directory = '~/nni-experiments/' 
 
 experiment.start(args.port)
@@ -39,12 +40,15 @@ while True:
     time.sleep(120)
     if experiment.get_status() == 'DONE':
         data_list = []
-        for item in exp.list_trial_jobs():
-            if 'finalMetricData' not in item.keys():
+        for item in experiment.list_trial_jobs():
+            if not item.finalMetricData:
+                print(item)
                 data_list.append(0)
             else:
-                data_list.append(float(item['finalMetricData'][0]['data']))
+                data_list.append(item.finalMetricData[0].data)
 
+        # for item in experiment.get_job_metrics().values():
+        #     data_list.append(item[0].data)
         # df = pd.DataFrame()
         if args.situation == 'aware':
             df = pd.read_csv('results/ppo_aware.csv', low_memory=False)

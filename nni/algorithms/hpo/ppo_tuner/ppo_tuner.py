@@ -347,7 +347,7 @@ class PPOTuner(Tuner):
         self.running_trials = {}                  # key: parameter_id, value: actions/states/etc.
         self.inf_batch_size = trials_per_update   # number of trials to generate in one inference
         self.first_inf = True                     # indicate whether it is the first time to inference new trials
-        self.trials_result = [None for _ in range(self.inf_batch_size)] # results of finished trials
+        self.trials_result = [0 for _ in range(self.inf_batch_size)] # results of finished trials
         self.is_nested = False
         self.seed = seed
 
@@ -461,7 +461,6 @@ class PPOTuner(Tuner):
             self.is_nested = True
             
         self.actions_spaces, self.actions_to_config, self.full_act_space, obs_space, nsteps = self._process_nas_space(search_space, self.is_nested)
-        print('self.actions_spaces:{}, self.actions_to_config:{}, self.full_act_space:{}, obs_space:{}, nsteps:{}'.format(self.actions_spaces, self.actions_to_config, self.full_act_space, obs_space, nsteps))
 
         self.model_config.observation_space = spaces.Discrete(obs_space)
         self.model_config.action_space = spaces.Discrete(obs_space)
@@ -501,15 +500,12 @@ class PPOTuner(Tuner):
             choose_branch = None
             for cnt, act in enumerate(actionss):
                 if cnt == 0:
-                    # assert self.actions_to_config[act][0] == 'branch'
                     chosen_arch['branch'] = {'_value': act, '_idx': act}
                     choose_branch = act
                 else:
                     # FIXME
-                    # act = np.clip(act, len(self.actions_spaces[0], (len(self.actions_spaces[0] + self.dims[choose_branch][cnt-1] - 1))
                     if act > (len(self.actions_spaces[0]) + self.dims[choose_branch][cnt-1] - 1):
                         print('out of bround!')
-                    print('cnt:{}, act:{}'.format(cnt, act))
                     act_name = self.full_act_space[act]
                     (_key, _type) = self.actions_to_config[cnt]
                     if _type == 'layer_choice' or _type == 'choice':
@@ -517,7 +513,6 @@ class PPOTuner(Tuner):
                         chosen_arch[_key] = {'_value': act_name, '_idx': idx}
                     else:
                         raise ValueError('unrecognized key: {0}'.format(_type))
-        print('actions:{}, choice arch:{}'.format(actions, chosen_arch))
         return self._remove_idx(chosen_arch)
 
     def generate_multiple_parameters(self, parameter_id_list, **kwargs):
@@ -569,26 +564,17 @@ class PPOTuner(Tuner):
 
         """
         if self.first_inf:
-            self.trials_result = [None for _ in range(self.inf_batch_size)]
+            self.trials_result = [0 for _ in range(self.inf_batch_size)]
             mb_obs, mb_actions, mb_values, mb_neglogpacs, mb_dones, last_values = self.model.inference(self.inf_batch_size)
             print('first generate_parameters....')
-            print('mb_obs:{}, mb_actions:{}, mb_values:{}, mb_neglogpacs:{}, mb_dones:{}, last_values:{}'\
-                .format(mb_obs, mb_actions, mb_values, mb_neglogpacs, mb_dones, last_values))
             
             if self.is_nested:
-                print('before actions:{}'.format(mb_actions))
-                # mb_actions = np.asarray(mb_actions)
+                # print('before actions:{}'.format(mb_actions))
                 for i in range(self.inf_batch_size):
                     branch_bround = copy.deepcopy(self.dims[mb_actions[0, i]])
-                    print('self.dims[mb_actions[0, i]]:{}'.format(branch_bround))
-                    # mb_obs[1, i] = np.clip(mb_obs[1, i], 0, self.max_dim[i]-1)
-                    # mb_actions[0, i] = np.clip(mb_actions[0, i], 0, self.max_dim[i]-1)
-                    # mb_actions[1, i] = np.clip(mb_actions[1, i], 0, self.max_dim[i]-1)
                     for j in range(1, self.model_config.nsteps):
-                        print('self.dims[mb_actions[0]][j]:{}'.format(branch_bround[j-1]))
                         mb_actions[j, i] = np.clip(mb_actions[j, i], len(self.actions_spaces[0]),  (len(self.actions_spaces[0]) + branch_bround[j-1] - 1))
-                # act = np.clip(act, len(self.actions_spaces[0]), (len(self.actions_spaces[0] + self.dims[mb_actions[0]][cnt-1] - 1)))
-                print('after actions:{}'.format(mb_actions))
+                # print('after actions:{}'.format(mb_actions))
 
             self.trials_info = TrialsInfo(mb_obs, mb_actions, mb_values, mb_neglogpacs,
                                           mb_dones, last_values, self.inf_batch_size)
@@ -603,7 +589,7 @@ class PPOTuner(Tuner):
 
         self.running_trials[parameter_id] = trial_info_idx # 显示是trial的第几个
         new_config = self._actions_to_config(actions)
-        print('new_config:{}'.format(new_config))
+        # print('new_config:{}'.format(new_config))
         return new_config
 
     def _next_round_inference(self):
@@ -612,30 +598,20 @@ class PPOTuner(Tuner):
         """
         logger.debug('Start next round inference...')
         self.finished_trials = 0
+        # print('self.trials_result:{}'.format(self.trials_result))
         self.model.compute_rewards(self.trials_info, self.trials_result)
         self.model.train(self.trials_info, self.inf_batch_size)
         self.running_trials = {}
-        # generate new trials
+        print('generate new trials...')
         self.trials_result = [None for _ in range(self.inf_batch_size)]
         mb_obs, mb_actions, mb_values, mb_neglogpacs, mb_dones, last_values = self.model.inference(self.inf_batch_size)
-        print('mb_obs:{}, mb_actions:{}, mb_values:{}, mb_neglogpacs:{}, mb_dones:{}, last_values:{}'\
-                .format(mb_obs, mb_actions, mb_values, mb_neglogpacs, mb_dones, last_values))
+        # print('mb_obs:{}, mb_actions:{}, mb_values:{}, mb_neglogpacs:{}, mb_dones:{}, last_values:{}'\
 
-        # FIXME: should clip in output 
         if self.is_nested:
-            print('before actions:{}'.format(mb_actions))
             for i in range(self.inf_batch_size):
                 branch_bround = copy.deepcopy(self.dims[mb_actions[0, i]])
-                print('self.dims[mb_actions[0, i]]:{}'.format(branch_bround))
-                # mb_obs[1, i] = np.clip(mb_obs[1, i], 0, self.max_dim[i]-1)
-                # mb_actions[0, i] = np.clip(mb_actions[0, i], 0, self.max_dim[i]-1)
-                # mb_actions[1, i] = np.clip(mb_actions[1, i], 0, self.max_dim[i]-1)
                 for j in range(1, self.model_config.nsteps):
-                    print('self.dims[mb_actions[0]][j]:{}'.format(branch_bround[j-1]))
                     mb_actions[j, i] = np.clip(mb_actions[j, i], len(self.actions_spaces[0]),  (len(self.actions_spaces[0]) + branch_bround[j-1] - 1))
-            # act = np.clip(act, len(self.actions_spaces[0]), (len(self.actions_spaces[0] + self.dims[mb_actions[0]][cnt-1] - 1)))
-            print('after actions:{}'.format(mb_actions))
-
 
         self.trials_info = TrialsInfo(mb_obs, mb_actions,
                                       mb_values, mb_neglogpacs,
@@ -700,7 +676,8 @@ class PPOTuner(Tuner):
         **kwargs
             Not used
         """
-        if not success:
+        # print('{} trial_end....'.format(parameter_id))
+        if not success or parameter_id in self.running_trials.keys():
             if parameter_id not in self.running_trials:
                 logger.warning('The trial is failed, but self.running_trial does not have this trial')
                 return
@@ -711,6 +688,7 @@ class PPOTuner(Tuner):
             logger.warning('In trial_end, values: %s', values)
             self.trials_result[trial_info_idx] = (sum(values) / len(values)) if values else 0
             self.finished_trials += 1
+            print('fail... trial id:{}, avarage values:{}'.format(parameter_id, str(self.trials_result[trial_info_idx])))
             if self.finished_trials == self.inf_batch_size:
                 logger.debug('Start next round inference in trial_end')
                 self._next_round_inference()
