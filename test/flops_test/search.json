@@ -3,15 +3,13 @@
         "_type": "choice",
         "_value": [
             {
-                "_name": "choice0_1_0_2",
+                "_name": "choice0_1_0_2_0_3",
                 "0_1": {
                     "_type": "choice",
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_2": {
@@ -19,9 +17,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_3": {
@@ -29,8 +25,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
+                        "avg_pool_3x3"
                     ]
                 },
                 "1_2": {
@@ -62,15 +57,13 @@
                 }
             },
             {
-                "_name": "choice0_1_0_3",
+                "_name": "choice0_1_0_2_1_2",
                 "0_1": {
                     "_type": "choice",
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_2": {
@@ -78,8 +71,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_3": {
@@ -88,8 +80,7 @@
                         "none",
                         "skip_connect",
                         "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "conv_1x1"
                     ]
                 },
                 "1_2": {
@@ -97,8 +88,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
+                        "avg_pool_3x3"
                     ]
                 },
                 "1_3": {
@@ -121,15 +111,13 @@
                 }
             },
             {
-                "_name": "choice0_1_1_2",
+                "_name": "choice0_1_0_2_1_3",
                 "0_1": {
                     "_type": "choice",
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_2": {
@@ -137,8 +125,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_3": {
@@ -156,8 +143,114 @@
                         "none",
                         "skip_connect",
                         "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "conv_1x1"
+                    ]
+                },
+                "1_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "2_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                }
+            },
+            {
+                "_name": "choice0_1_0_2_2_3",
+                "0_1": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "0_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "0_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "1_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "1_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "2_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                }
+            },
+            {
+                "_name": "choice0_1_0_3_1_2",
+                "0_1": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "0_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "1_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
                     ]
                 },
                 "1_3": {
@@ -180,15 +273,229 @@
                 }
             },
             {
-                "_name": "choice0_1_1_3",
+                "_name": "choice0_1_0_3_1_3",
                 "0_1": {
                     "_type": "choice",
                     "_value": [
                         "none",
                         "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "0_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
                         "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "conv_1x1"
+                    ]
+                },
+                "0_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "1_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "1_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "2_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                }
+            },
+            {
+                "_name": "choice0_1_0_3_2_3",
+                "0_1": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "0_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "1_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "1_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "2_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                }
+            },
+            {
+                "_name": "choice0_1_1_2_1_3",
+                "0_1": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "0_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "1_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "1_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "2_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                }
+            },
+            {
+                "_name": "choice0_1_1_2_2_3",
+                "0_1": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "0_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "1_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "1_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "2_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                }
+            },
+            {
+                "_name": "choice0_1_1_3_2_3",
+                "0_1": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_2": {
@@ -223,9 +530,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "2_3": {
@@ -233,72 +538,12 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
+                        "avg_pool_3x3"
                     ]
                 }
             },
             {
-                "_name": "choice0_1_2_3",
-                "0_1": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
-                    ]
-                },
-                "0_2": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "0_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "1_2": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "1_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "2_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
-                    ]
-                }
-            },
-            {
-                "_name": "choice0_2_0_3",
+                "_name": "choice0_2_0_3_1_2",
                 "0_1": {
                     "_type": "choice",
                     "_value": [
@@ -313,9 +558,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_3": {
@@ -323,9 +566,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "1_2": {
@@ -333,244 +574,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "1_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "2_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                }
-            },
-            {
-                "_name": "choice0_2_1_2",
-                "0_1": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "0_2": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
-                    ]
-                },
-                "0_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "1_2": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
-                    ]
-                },
-                "1_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "2_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                }
-            },
-            {
-                "_name": "choice0_2_1_3",
-                "0_1": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "0_2": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
-                    ]
-                },
-                "0_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "1_2": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "1_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
-                    ]
-                },
-                "2_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                }
-            },
-            {
-                "_name": "choice0_2_2_3",
-                "0_1": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "0_2": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
-                    ]
-                },
-                "0_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "1_2": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "1_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "2_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
-                    ]
-                }
-            },
-            {
-                "_name": "choice0_3_1_2",
-                "0_1": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "0_2": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
-                    ]
-                },
-                "0_3": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
-                    ]
-                },
-                "1_2": {
-                    "_type": "choice",
-                    "_value": [
-                        "none",
-                        "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "1_3": {
@@ -593,7 +597,7 @@
                 }
             },
             {
-                "_name": "choice0_3_1_3",
+                "_name": "choice0_2_0_3_1_3",
                 "0_1": {
                     "_type": "choice",
                     "_value": [
@@ -608,8 +612,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_3": {
@@ -617,9 +620,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "1_2": {
@@ -636,9 +637,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "2_3": {
@@ -652,7 +651,7 @@
                 }
             },
             {
-                "_name": "choice0_3_2_3",
+                "_name": "choice0_2_0_3_2_3",
                 "0_1": {
                     "_type": "choice",
                     "_value": [
@@ -667,8 +666,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_3": {
@@ -676,9 +674,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "1_2": {
@@ -704,14 +700,12 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 }
             },
             {
-                "_name": "choice1_2_1_3",
+                "_name": "choice0_2_1_2_1_3",
                 "0_1": {
                     "_type": "choice",
                     "_value": [
@@ -726,8 +720,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_3": {
@@ -744,9 +737,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "1_3": {
@@ -754,9 +745,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "2_3": {
@@ -770,7 +759,7 @@
                 }
             },
             {
-                "_name": "choice1_2_2_3",
+                "_name": "choice0_2_1_2_2_3",
                 "0_1": {
                     "_type": "choice",
                     "_value": [
@@ -785,8 +774,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
+                        "avg_pool_3x3"
                     ]
                 },
                 "0_3": {
@@ -803,9 +791,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "1_3": {
@@ -822,14 +808,228 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 }
             },
             {
-                "_name": "choice1_3_2_3",
+                "_name": "choice0_2_1_3_2_3",
+                "0_1": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "0_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "1_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "1_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "2_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                }
+            },
+            {
+                "_name": "choice0_3_1_2_1_3",
+                "0_1": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "1_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "1_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "2_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                }
+            },
+            {
+                "_name": "choice0_3_1_2_2_3",
+                "0_1": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "1_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "1_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "2_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                }
+            },
+            {
+                "_name": "choice0_3_1_3_2_3",
+                "0_1": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "0_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "1_2": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3",
+                        "conv_1x1"
+                    ]
+                },
+                "1_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                },
+                "2_3": {
+                    "_type": "choice",
+                    "_value": [
+                        "none",
+                        "skip_connect",
+                        "avg_pool_3x3"
+                    ]
+                }
+            },
+            {
+                "_name": "choice1_2_1_3_2_3",
                 "0_1": {
                     "_type": "choice",
                     "_value": [
@@ -862,8 +1062,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1"
+                        "avg_pool_3x3"
                     ]
                 },
                 "1_3": {
@@ -871,9 +1070,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 },
                 "2_3": {
@@ -881,9 +1078,7 @@
                     "_value": [
                         "none",
                         "skip_connect",
-                        "avg_pool_3x3",
-                        "conv_1x1",
-                        "conv_3x3"
+                        "avg_pool_3x3"
                     ]
                 }
             }
