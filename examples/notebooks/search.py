@@ -60,7 +60,7 @@ trainer = pl.Classification(train_dataloader=pl.DataLoader(train_dataset, batch_
 # Step 4: Configure the Experiment
 exp = RetiariiExperiment(model_space, trainer, [], simple_strategy)
 
-exp_config = RetiariiExeConfig('local')
+exp_config = RetiariiExeConfig('aml')
 exp_config.experiment_name = 'titanic_example'
 exp_config.trial_concurrency = 2
 exp_config.max_trial_number = 20
