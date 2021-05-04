@@ -5,10 +5,11 @@ import argparse
 
 def main(arch):
     parser = argparse.ArgumentParser(description='controller')
-    parser.add_argument('--flops', type=int, default='100')
+    parser.add_argument('--flops', type=int, default=100)
+    parser.add_argument('--dataset', type=str)
     args = parser.parse_args()
     
-    for t in query_nb201_trial_stats(arch, 200, 'cifar100','mean'):
+    for t in query_nb201_trial_stats(arch, 200, args.dataset,'mean'):
         # nni.report_final_result(t["test_acc"])
         # pprint.pprint(t)
         # print(t)
