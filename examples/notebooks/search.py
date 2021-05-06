@@ -7,7 +7,9 @@ import nni.retiarii.nn.pytorch as nn
 import nni.retiarii.strategy as strategy
 import nni.retiarii.evaluator.pytorch.lightning as pl
 
+from pathlib import Path
 from dataset import TitanicDataset
+from nni.retiarii import serialize
 from nni.retiarii.experiment.pytorch import RetiariiExeConfig, RetiariiExperiment
 
 
@@ -39,8 +41,8 @@ class Net(nn.Module):
         return x
 
 # Step 1: Prepare the dataset
-train_dataset = TitanicDataset('./data', train=True)
-test_dataset = TitanicDataset('./data', train=False)
+train_dataset = serialize(TitanicDataset, root='./data', train=True)
+test_dataset = serialize(TitanicDataset, root='./data', train=False)
 
 # Step 2: Define the Model Space
 model_space = Net(len(train_dataset.__getitem__(0)[0]))
@@ -54,8 +56,8 @@ simple_strategy = strategy.TPEStrategy()
 # Step 3.2: Choose or Write a Model Evaluator
 trainer = pl.Classification(train_dataloader=pl.DataLoader(train_dataset, batch_size=16),
                             val_dataloaders=pl.DataLoader(
-    test_dataset, batch_size=16),
-    max_epochs=20)
+                            test_dataset, batch_size=16),
+                            max_epochs=20)
 
 # Step 4: Configure the Experiment
 exp = RetiariiExperiment(model_space, trainer, [], simple_strategy)
@@ -65,16 +67,18 @@ exp_config.experiment_name = 'titanic_example'
 exp_config.trial_concurrency = 2
 exp_config.max_trial_number = 20
 exp_config.max_experiment_duration = '2h'
+exp_config.experiment_working_directory = '' # an absolute path
+exp_config.trial_code_directory = Path(__file__).parent
 exp_config.trial_gpu_number = 1
-exp_config.nni_manager_ip = '' # your nni_manager_ip
+exp_config.nni_manager_ip = ''  # your nni_manager_ip
 
 # training service config
 exp_config.training_service.use_active_gpu = True
-exp_config.training_service.subscription_id = '' # your subscription id
-exp_config.training_service.resource_group = '' # your resource group
-exp_config.training_service.workspace_name = '' # your workspace name
-exp_config.training_service.compute_target = '' # your compute target
-exp_config.training_service.docker_image = ''  # your docker image
+exp_config.training_service.subscription_id = ''  # your subscription id
+exp_config.training_service.resource_group = ''  # your resource group
+exp_config.training_service.workspace_name = ''  # your workspace name
+exp_config.training_service.compute_target = ''  # your compute target
+exp_config.training_service.docker_image = 'kvartet/nnitest:v2.2'  # your docker image
 
 # Step 5: Run and View the Experiment
 exp.run(exp_config, 8081 + random.randint(0, 100))
