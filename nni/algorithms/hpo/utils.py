@@ -5,8 +5,8 @@ from past.utils import old_div
 
 
 class RandomNumberGenerator():
-    def __init__(self):
-        np.random.seed(13) # 7 9 13
+    def __init__(self, seed):
+        np.random.seed(seed) # 7 9 13
 
     def integer(self, high):
         return np.random.randint(0, high)

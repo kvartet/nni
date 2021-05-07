@@ -140,14 +140,14 @@ class Result():
 
 
 class TPETuner(Tuner):
-    def __init__(self, aware=True, minimize_mode=False):
+    def __init__(self, seed, aware=True, minimize_mode=False):
         self.n_startup_jobs = 20
         self.prior_weight = 1.0
         self.oloss_gamma = 0.25
         self.lf = 25
         self.n_ei_candidates = 24
         self.eps = 1e-12
-        self.rng = RandomNumberGenerator()
+        self.rng = RandomNumberGenerator(seed)
 
         # self.space = SearchSpace(search_space)
         self.minimize = minimize_mode
@@ -301,8 +301,8 @@ class TPETuner(Tuner):
         above = [item for item in history_sorted if tag in item.param.keys()][n_below:]
         below_value = [item.param[tag] for item in sorted(below, key=lambda x: x.param_id)]
         above_value = [item.param[tag] for item in sorted(above, key=lambda x: x.param_id)]
-        print('np.asarray(below_value):{}, np.asarray(above_value):{}'\
-            .format(np.asarray(below_value), np.asarray(above_value)))
+        # print('np.asarray(below_value):{}, np.asarray(above_value):{}'\
+        #     .format(np.asarray(below_value), np.asarray(above_value)))
         return np.asarray(below_value), np.asarray(above_value)
 
     def find_best(self, samples, below_llik, above_llik, size):

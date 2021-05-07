@@ -128,7 +128,7 @@ def flops_20(d):
     op3 = {"_type": "choice", "_value": ["none", "skip_connect", "avg_pool_3x3", "conv_1x1", "conv_3x3"]}
     for c in combinations(op_list, 2):
         tmp = {}
-        tmp[c[0]], tmp[c[0]] = op3, op3
+        tmp[c[0]], tmp[c[1]] = op3, op3
         for item in op_list:
             if item not in c:
                 tmp[item] = op1
