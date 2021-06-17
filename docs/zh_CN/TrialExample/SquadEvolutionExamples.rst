@@ -120,7 +120,7 @@
    # 你的 nni_manager ip 地址
    nniManagerIp: 10.10.10.10
    tuner:
-     codeDir: https://github.com/Microsoft/nni/tree/v2.0/examples/tuners/ga_customer_tuner
+     codeDir: https://github.com/Microsoft/nni/tree/v2.2/examples/tuners/ga_customer_tuner
      classFileName: customer_tuner.py
      className: CustomerTuner
      classArgs:
