@@ -45,7 +45,8 @@
      - PPO Tuner 是基于 PPO 算法的强化学习 Tuner。 `参考论文 <https://arxiv.org/abs/1707.06347>`__
    * - `PBT Tuner <#PBTTuner>`__
      - PBT Tuner 是一种简单的异步优化算法，在固定的计算资源下，它能有效的联合优化一组模型及其超参来最大化性能。 `参考论文 <https://arxiv.org/abs/1711.09846v1>`__
-
+   * - `DNGO Tuner <#DNGOTuner>`__
+     - Use of neural networks as an alternative to GPs to model distributions over functions in bayesian optimization.
 
 用法
 ------------------------
@@ -188,7 +189,7 @@ SMAC
    名称：**SMAC**
 
 
-当前 SMAC 不支持在 WIndows 下运行。 原因参考：`GitHub issue <https://github.com/automl/SMAC3/issues/483>`__ 
+**当前 SMAC 不支持在 WIndows 下运行。** 原因参考：`GitHub issue <https://github.com/automl/SMAC3/issues/483>`__ 
 
 **安装**
 
@@ -512,7 +513,7 @@ PPO Tuner
 
 **建议场景**
 
-PPO Tuner 是基于 PPO 算法的强化学习 Tuner。 PPOTuner 可用于使用 NNI NAS 接口进行的神经网络结构搜索。 一般来说，尽管 PPO 算法比其它强化学习算法效率更高，但强化学习算法需要更多的计算资源。 当有大量可用的计算资源时，才建议使用此 Tuner。 以在简单的任务上尝试，如 :githublink:`mnist-nas <examples/nas/classic_nas>` 示例。 `查看详细信息 <./PPOTuner.rst>`__。
+PPO Tuner 是基于 PPO 算法的强化学习 Tuner。 PPOTuner 可用于使用 NNI NAS 接口进行的神经网络结构搜索。 一般来说，尽管 PPO 算法比其它强化学习算法效率更高，但强化学习算法需要更多的计算资源。 当有大量可用的计算资源时，才建议使用此 Tuner。 You could try it on a very simple task, such as the :githublink:`mnist-nas <examples/nas/legacy/classic_nas>` example. `查看详细信息 <./PPOTuner.rst>`__。
 
 **classArgs 要求：**
 
@@ -573,6 +574,41 @@ Population Based Training (PBT，基于种群的训练)，将并扩展并行搜�
        optimize_mode: maximize
 
 注意，要使用此 Tuner，Trial 代码也需要相应的修改，参考 `PBTTuner 文档 <./PBTTuner.rst>`__ 了解详情。
+
+DNGO Tuner
+^^^^^^^^^^
+
+..
+
+   Built-in Tuner Name: **DNGOTuner**
+
+DNGO advisor requires `pybnn`, which can be installed with the following command.
+
+.. code-block:: bash
+
+   pip install nni[DNGO]
+
+**Suggested scenario**
+
+Applicable to large scale hyperparameter optimization. Bayesian optimization that rapidly finds competitive models on benchmark object recognition tasks using convolutional networks, and image caption generation using neural language models.
+
+**classArgs requirements:**
+
+
+* **optimize_mode** (*'maximize' or 'minimize'*\ ) - If 'maximize', the tuner will target to maximize metrics. If 'minimize', the tuner will target to minimize metrics.
+* **sample_size** (*int, default = 1000*) - Number of samples to select in each iteration. The best one will be picked from the samples as the next trial.
+* **trials_per_update** (*int, default = 20*) - Number of trials to collect before updating the model.
+* **num_epochs_per_training** (*int, default = 500*) - Number of epochs to train DNGO model.
+
+**Usage example**
+
+.. code-block:: yaml
+
+   # config.yml
+   tuner:
+     builtinTunerName: DNGOTuner
+     classArgs:
+       optimize_mode: maximize
 
 **参考和反馈**
 ------------------------------
