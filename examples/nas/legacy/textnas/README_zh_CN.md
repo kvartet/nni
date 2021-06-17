@@ -1,12 +1,12 @@
 # TextNAS: A Neural Architecture Search Space tailored for Text Representation
 
-TextNAS 由 MSRA 提出 正式版本。
+TextNAS by MSRA. Official Release.
 
-[论文链接](https://arxiv.org/abs/1912.10729)
+[Paper link](https://arxiv.org/abs/1912.10729)
 
-## 准备
+## Preparation
 
-准备词向量和 SST 数据集，并按如下结构放到 data 目录中：
+Prepare the word vectors and SST dataset, and organize them in data directory as shown below:
 
 ```
 textnas
@@ -25,25 +25,25 @@ textnas
 └── utils.py
 ```
 
-以下链接有助于查找和下载相应的数据集：
+The following link might be helpful for finding and downloading the corresponding dataset:
 
 * [GloVe: Global Vectors for Word Representation](https://nlp.stanford.edu/projects/glove/)
 * [Recursive Deep Models for Semantic Compositionality Over a Sentiment Treebank](https://nlp.stanford.edu/sentiment/)
 
-## 搜索
+## Search
 
 ```
 python search.py
 ```
 
-在每个搜索 Epoch 后，会直接测试 10 个采样的结构。 10 个 Epoch 后的性能预计为 40% - 42%。
+After each search epoch, 10 sampled architectures will be tested directly. Their performances are expected to be 40% - 42% after 10 epochs.
 
-默认情况下，20 个采样结构会被导出到 `checkpoints` 目录中，以便进行下一步处理。
+By default, 20 sampled architectures will be exported into `checkpoints` directory for next step.
 
-## 重新训练
+## Retrain
 
 ```
 sh run_retrain.sh
 ```
 
-默认情况下，脚本会重新训练 SST-2 数据集上作者所提供的网络结构。
+By default, the script will retrain the architecture provided by the author on the SST-2 dataset.
