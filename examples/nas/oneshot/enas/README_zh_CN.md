@@ -1,1 +1,1 @@
-[文档](https://nni.readthedocs.io/zh/latest/NAS/ENAS.html)
+[Documentation](https://nni.readthedocs.io/en/latest/NAS/ENAS.html)
