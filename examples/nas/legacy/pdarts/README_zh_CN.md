@@ -1,1 +1,1 @@
-[文档](https://nni.readthedocs.io/zh/latest/NAS/PDARTS.html)
+[Documentation](https://nni.readthedocs.io/en/latest/NAS/PDARTS.html)
