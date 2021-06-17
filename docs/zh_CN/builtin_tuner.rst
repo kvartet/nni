@@ -10,9 +10,7 @@ Tuner 从 Trial 接收指标结果，来评估一组超参或网络结构的性�
     :maxdepth: 1
     
     概述<Tuner/BuiltinTuner>
-    TPE<Tuner/HyperoptTuner>
-    Random Search（随机搜索）<Tuner/HyperoptTuner>
-    Anneal（退火）<Tuner/HyperoptTuner>
+    TPE / Random Search / Anneal <Tuner/HyperoptTuner>
     Naïve Evolution（朴素进化）<Tuner/EvolutionTuner>
     SMAC<Tuner/SmacTuner>
     Metis Tuner<Tuner/MetisTuner>
