@@ -58,10 +58,12 @@ NNI 目前支持下面列出的 One-Shot NAS 算法，并且正在添加更多�
      - `Cyclic Differentiable Architecture Search <https://arxiv.org/pdf/2006.10724.pdf>`__ 在搜索和评估网络之间建立循环反馈机制。 通过引入的循环的可微分架构搜索框架将两个网络集成为一个架构。
    * - `ProxylessNAS <Proxylessnas.rst>`__
      - `ProxylessNAS: Direct Neural Architecture Search on Target Task and Hardware <https://arxiv.org/abs/1812.00332>`__. 它删除了代理，直接从大规模目标任务和目标硬件平台进行学习。
+   * - `FBNet <FBNet.rst>`__
+     - `FBNet: Hardware-Aware Efficient ConvNet Design via Differentiable Neural Architecture Search <https://arxiv.org/abs/1812.03443>`__. It is a block-wise differentiable neural network architecture search method with the hardware-aware constraint.
    * - `TextNAS <TextNAS.rst>`__
      - `TextNAS: A Neural Architecture Search Space tailored for Text Representation <https://arxiv.org/pdf/1912.10729.pdf>`__. 这是专门用于文本表示的神经网络架构搜索算法。
    * - `Cream <Cream.rst>`__
-     - `Cream of the Crop: Distilling Prioritized Paths For One-Shot Neural Architecture Search  <https://papers.nips.cc/paper/2020/file/d072677d210ac4c03ba046120f0802ec-Paper.pdf>`__. 一种新的 NAS 算法，无需使用进化算法即可提取搜索空间中的优先路径。 在 ImageNet 上的性能具有竞争力，特别是对于小模型（例如： FLOPs < 200 M 时）。
+     - `Cream of the Crop: Distilling Prioritized Paths For One-Shot Neural Architecture Search  <https://papers.nips.cc/paper/2020/file/d072677d210ac4c03ba046120f0802ec-Paper.pdf>`__. 一种新的 NAS 算法，无需使用进化算法即可提取搜索空间中的优先路径。 在 ImageNet 上的性能具有竞争力，特别是对于小模型（例如： FLOPs < 200 M 时）。 在 ImageNet 上的性能具有竞争力，特别是对于小模型（例如： <200 M FLOPs).
 
 
 One-shot 算法 **独立运行，不需要 nnictl**。 NNI 支持 PyTorch 和 TensorFlow 2.x。
