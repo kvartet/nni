@@ -103,7 +103,7 @@ Experiment 配置
 =========
 
 Experiment（实验）配置参考
-^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 experimentName
 --------------
@@ -393,11 +393,11 @@ TrainingServiceConfig
 
 - `LocalConfig`_
 - `RemoteConfig`_
-- `OpenpaiConfig <openpai-class>`_
+- :ref:`OpenpaiConfig <openpai-class>`
 - `AmlConfig`_
------------------
+- `HybridConfig`_
 
-对于其他训练平台，目前 NNI 建议使用 `v1 配置模式 <../Tutorial/ExperimentConfig.rst>`_ 。
+对于 `Kubeflow <../TrainingService/KubeflowMode.rst>`_, `FrameworkController <../TrainingService/FrameworkControllerMode.rst>`_, 和 `AdaptDL <../TrainingService/AdaptDLMode.rst>`_ 训练平台，目前 NNI 建议使用 `v1 配置模式 <../Tutorial/ExperimentConfig.rst>`_ 。
 
 
 LocalConfig
@@ -485,7 +485,7 @@ RemoteMachineConfig
 """""""""""""""""""
 
 host
--------------------
+****
 
 机器的 IP 或主机名（域名）。
 
@@ -493,7 +493,7 @@ host
 
 
 port
-=====
+****
 
 SSH 服务端口。
 
@@ -503,7 +503,7 @@ SSH 服务端口。
 
 
 user
-----------
+****
 
 登录用户名。
 
@@ -511,7 +511,7 @@ user
 
 
 password
----------------------------
+********
 
 登录密码。
 
@@ -521,7 +521,7 @@ password
 
 
 sshKeyFile
-----------
+**********
 
 到 sshKeyFile的 路径_ 。
 
@@ -531,7 +531,7 @@ sshKeyFile
 
 
 sshPassphrase
-----------
+*************
 
 SSH 标识文件的密码。
 
@@ -539,7 +539,7 @@ SSH 标识文件的密码。
 
 
 useActiveGpu
-^^^^^^^^^
+************
 
 指定 NNI 是否应向被其他任务占用的 GPU 提交 Trial。
 
@@ -562,7 +562,7 @@ useActiveGpu
 
 
 maxTrialNumberPerGpu
-^^^^^^^^^^^^
+********************
 
 指定可以共享一个 GPU 的 Trial 数目。
 
@@ -572,7 +572,7 @@ maxTrialNumberPerGpu
 
 
 gpuIndices
-^^^^^^^^^^^^^
+**********
 
 设定对 Trial 进程可见的 GPU。
 
@@ -583,8 +583,8 @@ gpuIndices
 这用作环境变量 ``CUDA_VISIBLE_DEVICES``。
 
 
-- 在 Python 代码中赋值时，相对路径是相对于当前工作目录的路径。
---------------------
+pythonPath
+**********
 
 指定 Python 环境。
 
@@ -645,7 +645,7 @@ OpenPAI 用户令牌。
 这可以在 OpenPAI 用户设置页面中找到。
 
 
-trialPrepareCommand
+trialCpuNumber
 """"""""""""""
 
 指定每个 Trial 在 OpenPAI 容器中使用的 CPU 数。
