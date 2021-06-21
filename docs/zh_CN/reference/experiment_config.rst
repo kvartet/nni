@@ -4,7 +4,7 @@ Experiment 配置
 
 创建 Experiment 所需要的配置文件。 本文介绍了配置文件的内容，并提供了一些示例。
 
-.. 注意
+.. Note::
 
     1. 此文档的字段使用 ``camelCase`` 法命名。 对于 Python 库 ``nni.experiment``，需要转换成 ``snake_case`` 形式。
 
@@ -665,7 +665,7 @@ trialMemorySize
 示例：``"8gb"``, ``"8192mb"``
 
 
-nniManagerStorageMountPoint
+storageConfigName
 """""""""""""""""
 
 设置 OpenPAI 中使用的存储名称。
